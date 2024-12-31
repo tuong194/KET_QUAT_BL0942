@@ -1,0 +1,25 @@
+C51 COMPILER V9.01   BL0942                                                                12/31/2024 08:06:11 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE BL0942
+OBJECT MODULE PLACED IN .\OBJ\BL0942.obj
+COMPILER INVOKED BY: C:\Keil_v4\C51\BIN\C51.EXE ..\code\BL0942\BL0942.c BROWSE DEBUG OBJECTEXTEND PRINT(.\LST\BL0942.lst
+                    -) OBJECT(.\OBJ\BL0942.obj)
+
+line level    source
+
+   1          #include "./BL0942.h"  // SPI hỗ trợ max 900kHz
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
