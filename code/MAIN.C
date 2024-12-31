@@ -18,7 +18,9 @@
 #include <Absacc.h>
 
 #include <Stdio.h>  // for printf
-#include <math.h>
+#include <stdarg.h>
+#include <string.h>
+//#include <stdint.h>
 
 #include ".\include\REG_MG82F6D17.H"
 #include ".\include\Type.h"
@@ -65,12 +67,57 @@ set CpuClk (MAX.36MHz)
 #define TIMER_12T_1ms_TH	((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) /256) 			
 #define TIMER_12T_1ms_TL	((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) %256)
 
+#define SFR_Page_(x) SFRPI = x;
+
 #define LED_G_0		P33
 #define LED_R		P34
 #define LED_G_1		P35
 
 
 #define SPI_nSS		P33
+
+
+/***********************************************************************************
+Function:   	void INT_UART0(void)
+Description:	UART0 Interrupt handler
+Input:
+Output:
+*************************************************************************************/
+void INT_UART0(void) interrupt INT_VECTOR_UART0
+{
+	_push_(SFRPI);
+
+	SFR_Page_(0);
+	if (TI0)
+	{
+		TI0 = 0;
+		if (Uart0TxIn == Uart0TxOut)
+		{
+			bUart0TxFlag = FALSE;
+		}
+		else
+		{
+			S0BUF = TxBuf[Uart0TxOut];
+			bUart0TxFlag = TRUE;
+			Uart0TxOut++;
+			if (Uart0TxOut >= UART0_TX_BUFF_SIZE)
+			{
+				Uart0TxOut = 0;
+			}
+		}
+	}
+	if (RI0)
+	{
+		RI0 = 0;
+		RcvBuf[Uart0RxIn] = S0BUF;
+		Uart0RxIn++;
+		if (Uart0RxIn >= UART0_RX_BUFF_SIZE)
+		{
+			Uart0RxIn = 0;
+		}
+	}
+	_pop_(SFRPI);
+}
 
 
 u16 time_count = 0;
@@ -150,7 +197,7 @@ Output:
 *************************************************************************************/
 void Uart0SendStr(u8 *PStr)
 {
-	while (*PStr != 0)
+	while (*PStr != '\0')
 	{
 		Uart0SendByte(*PStr);
 		PStr++;
@@ -246,6 +293,11 @@ void InitPort(void)
 	PORT_SetP3PushPull(BIT3);					// Set P33(nSS) as push-pull for output
 	//UART
 	PORT_SetP3QuasiBi(BIT0 | BIT1);  // rx tx
+	//Pin
+	PORT_SetP3OpenDrain(BIT4); // BTN
+	PORT_SetP2AInputOnly(BIT4); // ZX_BL
+	PORT_SetP2PushPull(BIT2); // relay
+	PORT_SetP6PushPull(BIT0 | BIT1); // led
 
 }
 
@@ -414,7 +466,7 @@ void InitSPI(void)
 	
 	SPI_Enable();									// Enable SPI
 	SPI_SelectMASTERByMSTRbit();					// Set to MASTER
-	SPI_SetClock(SPI_CLK_SYSCLK_32);					// Set Clock SYSCLK/4 48M/4=12M
+	SPI_SetClock(SPI_CLK_SYSCLK_32);					// Set Clock SYSCLK/32 = 24M/32= 750 KHz
 	SPI_SetCPOL_0();								// CPOL=0 
 	SPI_SetDataMSB();								// Data MSB
 	SPI_SetCPHA_1();								// CPHA=1
@@ -598,8 +650,25 @@ void InitSystem(void)
 	WDT_Enable();  // enable WDT
 }
 
-void rd_print(u8 *PStr){
-	Uart0SendStr(PStr);
+/*
+int sprintf (char *__stream, const char *__format, ...)
+{
+  register int __retval;
+  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
+  __retval = __mingw_vsprintf( __stream, __format, __local_argv );
+  __builtin_va_end( __local_argv );
+  return __retval;
+}
+*/
+void rd_print(const char *__format, ...){
+	xdata uint8_t Buff_print[32] = {0};
+	char *__stream = &Buff_print[0];
+	va_list __local_argv;
+	va_start( __local_argv, __format );
+  	vsprintf( __stream, __format, __local_argv );
+  	va_end( __local_argv );
+	Uart0SendStr(Buff_print);
+
 }
 
 void RD_Send_Byte_SPI(u8 data_b){
@@ -609,10 +678,14 @@ void RD_Send_Byte_SPI(u8 data_b){
 }
 void RD_Send_String_SPI(u8 *data_str){
 	while(*data_str != NULL){
-		RD_Send_Byte_SPI(*(data_str++));
+		RD_Send_Byte_SPI(*data_str++);
 	}
 }
 
+
+xdata int8_t data_sendx[6] = {12, 123, 15, 16, 17, 18};
+// int xxx = 123;
+// int xxx2 = 13;
 
 void main()
 {
@@ -625,14 +698,20 @@ void main()
 	bUart0TxFlag = 0;
 	/*================================================*/
 	DelayXms(1000);
+	Uart0SendStr("hello\n");
+	
 	
     while(1)
-    {
-		u8 data_send[7] = {0};
-		RD_Send_String_SPI(data_send);
-		rd_print("hello\n");
-		DelayXms(1000);
+    {	
 
+		WDT_Clear();
+
+		rd_print("arr: %d %d %d %d %d %d\n", data_sendx[0], data_sendx[1], data_sendx[2], data_sendx[3], data_sendx[4], data_sendx[5]);
+
+		rd_print("helloaaa\n\n");
+		
+		DelayXms(1500);
+		
     }
 }
 

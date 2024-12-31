@@ -7,3 +7,47 @@ E:\mgw\Code_Tuong\KETQUAT\KeilPrj\MG82F6D17_DEMO.uvproj
 Project File Date:  12/30/2024
 
 <h2>Output:</h2>
+Build target 'Target 1'
+compiling MAIN.C...
+..\CODE\MAIN.C(612): warning C206: 'RD_Send_Byte': missing function-prototype
+..\CODE\MAIN.C(612): error C267: 'RD_Send_Byte': requires ANSI-style prototype
+compiling BL0942.c...
+Target not created
+Build target 'Target 1'
+compiling MAIN.C...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?WRITE_DATA_FASH?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_READ_DATA_FLASH?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_RD_PRINT?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_RD_SEND_STRING_SPI?MAIN
+Program Size: data=30.4 xdata=73 code=975
+creating hex file from ".\OBJ\MG82F6D17_DEMO"...
+".\OBJ\MG82F6D17_DEMO" - 0 Error(s), 4 Warning(s).
+Build target 'Target 1'
+compiling MAIN.C...
+compiling BL0942.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?WRITE_DATA_FASH?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_READ_DATA_FLASH?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_RD_SEND_STRING_SPI?MAIN
+Program Size: data=30.4 xdata=73 code=991
+creating hex file from ".\OBJ\MG82F6D17_DEMO"...
+".\OBJ\MG82F6D17_DEMO" - 0 Error(s), 3 Warning(s).
+Build target 'Target 1'
+compiling MAIN.C...
+compiling BL0942.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?WRITE_DATA_FASH?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_READ_DATA_FLASH?MAIN
+Program Size: data=37.4 xdata=73 code=1272
+creating hex file from ".\OBJ\MG82F6D17_DEMO"...
+".\OBJ\MG82F6D17_DEMO" - 0 Error(s), 2 Warning(s).
