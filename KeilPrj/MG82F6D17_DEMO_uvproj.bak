@@ -351,6 +351,11 @@
               <FileType>1</FileType>
               <FilePath>..\code\MAIN.C</FilePath>
             </File>
+            <File>
+              <FileName>BL0942.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\BL0942\BL0942.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

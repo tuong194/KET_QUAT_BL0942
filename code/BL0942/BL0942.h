@@ -20,12 +20,18 @@
 #define REG_IRMS      (0x03)
 #define REG_VRMS      (0x04)
 
-//#define GET_DATA_SPI()		SPDAT
+#define RD_LOG              1
+#define RD_PIN_BTN          P61
+#define GET_DATA_SPI()		SPDAT
+#define RD_PRINT_HEX(x)     rd_print("0x%02X ", (unsigned int)(x))
 
 
-//extern void RD_Send_String_SPI(u8 *data_str);
-//extern void rd_print(u8 *PStr);
-//void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w);
+extern void RD_Send_String_SPI(u8 *data_str);
+extern void rd_print(const char *__format, ...);
+
+void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w);
+void RD_setup_BL0942(void);
+void RD_Scan_Btn(void);
 
 
 #endif /* BL_0942_H_ */

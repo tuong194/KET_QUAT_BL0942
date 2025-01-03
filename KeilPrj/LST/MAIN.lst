@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 1   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
@@ -37,122 +37,122 @@ line level    source
   27          #include ".\include\API_Macro_MG82F6D17.H"
   28          #include ".\include\API_Uart_BRGRL_MG82F6D17.H"
   29          
-  30          #define UART0_RX_BUFF_SIZE 32
-  31          #define UART0_TX_BUFF_SIZE 32
-  32          xdata u8 RcvBuf[UART0_RX_BUFF_SIZE];
-  33          u8 Uart0RxIn = 0;
-  34          u8 Uart0RxOut = 0;
-  35          xdata u8 TxBuf[UART0_TX_BUFF_SIZE];
-  36          u8 Uart0TxIn = 0;
-  37          u8 Uart0TxOut = 0;
-  38          bit bUart0TxFlag;
-  39          
-  40          #define IAP_END_ADDRESS 0x3400
-  41          #define SIZE_DATA 9
-  42          xdata uint8_t data_flash[SIZE_DATA];
-  43          
-  44          
-  45          /*************************************************
-  46          Set SysClk (MAX.50MHz) (MAX.50MHz)
-  47          Selection: 
-  48                  11059200,12000000,
-  49                  22118400,24000000,
-  50                  29491200,32000000,
-  51                  44236800,48000000
-  52          *************************************************/
-  53          #define MCU_SYSCLK              24000000
-  54          
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 2   
+  30          #include "./BL0942/BL0942.h"
+  31          
+  32          #define UART0_RX_BUFF_SIZE 32
+  33          #define UART0_TX_BUFF_SIZE 32
+  34          xdata u8 RcvBuf[UART0_RX_BUFF_SIZE];
+  35          u8 Uart0RxIn = 0;
+  36          u8 Uart0RxOut = 0;
+  37          xdata u8 TxBuf[UART0_TX_BUFF_SIZE];
+  38          u8 Uart0TxIn = 0;
+  39          u8 Uart0TxOut = 0;
+  40          bit bUart0TxFlag;
+  41          
+  42          #define IAP_END_ADDRESS 0x3400
+  43          #define SIZE_DATA 9
+  44          xdata uint8_t data_flash[SIZE_DATA];
+  45          
+  46          
+  47          /*************************************************
+  48          Set SysClk (MAX.50MHz) (MAX.50MHz)
+  49          Selection: 
+  50                  11059200,12000000,
+  51                  22118400,24000000,
+  52                  29491200,32000000,
+  53                  44236800,48000000
+  54          *************************************************/
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 2   
 
-  55          /*************************************************/
-  56          /*************************************************
-  57          set CpuClk (MAX.36MHz)
-  58                  1) CpuCLK=SysCLK
-  59                  2) CpuClk=SysClk/2
-  60          *************************************************/
-  61          #define MCU_CPUCLK              (MCU_SYSCLK)
-  62          //#define MCU_CPUCLK            (MCU_SYSCLK/2)
-  63          
-  64          #define TIMER_1T_1ms_TH ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(1000000)))) /256)                        
-  65          #define TIMER_1T_1ms_TL ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(1000000)))) %256)
-  66          
-  67          #define TIMER_12T_1ms_TH        ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) /256)                       
-  68          #define TIMER_12T_1ms_TL        ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) %256)
-  69          
-  70          #define SFR_Page_(x) SFRPI = x;
+  55          #define MCU_SYSCLK              24000000
+  56          
+  57          /*************************************************/
+  58          /*************************************************
+  59          set CpuClk (MAX.36MHz)
+  60                  1) CpuCLK=SysCLK
+  61                  2) CpuClk=SysClk/2
+  62          *************************************************/
+  63          #define MCU_CPUCLK              (MCU_SYSCLK)
+  64          //#define MCU_CPUCLK            (MCU_SYSCLK/2)
+  65          
+  66          #define TIMER_1T_1ms_TH ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(1000000)))) /256)                        
+  67          #define TIMER_1T_1ms_TL ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(1000000)))) %256)
+  68          
+  69          #define TIMER_12T_1ms_TH        ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) /256)                       
+  70          #define TIMER_12T_1ms_TL        ((65536-(u16)(float)(1000*((float)(MCU_SYSCLK)/(float)(12000000)))) %256)
   71          
-  72          #define LED_G_0         P33
-  73          #define LED_R           P34
-  74          #define LED_G_1         P35
-  75          
-  76          
-  77          #define SPI_nSS         P33
+  72          #define SFR_Page_(x) SFRPI = x;
+  73          
+  74          #define LED_G_0         P33
+  75          #define LED_R           P34
+  76          #define LED_G_1         P35
+  77          
   78          
-  79          
-  80          /***********************************************************************************
-  81          Function:       void INT_UART0(void)
-  82          Description:    UART0 Interrupt handler
-  83          Input:
-  84          Output:
-  85          *************************************************************************************/
-  86          void INT_UART0(void) interrupt INT_VECTOR_UART0
-  87          {
-  88   1              _push_(SFRPI);
-  89   1      
-  90   1              SFR_Page_(0);
-  91   1              if (TI0)
-  92   1              {
-  93   2                      TI0 = 0;
-  94   2                      if (Uart0TxIn == Uart0TxOut)
-  95   2                      {
-  96   3                              bUart0TxFlag = FALSE;
-  97   3                      }
-  98   2                      else
-  99   2                      {
- 100   3                              S0BUF = TxBuf[Uart0TxOut];
- 101   3                              bUart0TxFlag = TRUE;
- 102   3                              Uart0TxOut++;
- 103   3                              if (Uart0TxOut >= UART0_TX_BUFF_SIZE)
- 104   3                              {
- 105   4                                      Uart0TxOut = 0;
- 106   4                              }
- 107   3                      }
- 108   2              }
- 109   1              if (RI0)
- 110   1              {
- 111   2                      RI0 = 0;
- 112   2                      RcvBuf[Uart0RxIn] = S0BUF;
- 113   2                      Uart0RxIn++;
- 114   2                      if (Uart0RxIn >= UART0_RX_BUFF_SIZE)
- 115   2                      {
- 116   3                              Uart0RxIn = 0;
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 3   
+  79          #define SPI_nSS         P33
+  80          
+  81          
+  82          /***********************************************************************************
+  83          Function:       void INT_UART0(void)
+  84          Description:    UART0 Interrupt handler
+  85          Input:
+  86          Output:
+  87          *************************************************************************************/
+  88          void INT_UART0(void) interrupt INT_VECTOR_UART0
+  89          {
+  90   1              _push_(SFRPI);
+  91   1      
+  92   1              SFR_Page_(0);
+  93   1              if (TI0)
+  94   1              {
+  95   2                      TI0 = 0;
+  96   2                      if (Uart0TxIn == Uart0TxOut)
+  97   2                      {
+  98   3                              bUart0TxFlag = FALSE;
+  99   3                      }
+ 100   2                      else
+ 101   2                      {
+ 102   3                              S0BUF = TxBuf[Uart0TxOut];
+ 103   3                              bUart0TxFlag = TRUE;
+ 104   3                              Uart0TxOut++;
+ 105   3                              if (Uart0TxOut >= UART0_TX_BUFF_SIZE)
+ 106   3                              {
+ 107   4                                      Uart0TxOut = 0;
+ 108   4                              }
+ 109   3                      }
+ 110   2              }
+ 111   1              if (RI0)
+ 112   1              {
+ 113   2                      RI0 = 0;
+ 114   2                      RcvBuf[Uart0RxIn] = S0BUF;
+ 115   2                      Uart0RxIn++;
+ 116   2                      if (Uart0RxIn >= UART0_RX_BUFF_SIZE)
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 3   
 
- 117   3                      }
- 118   2              }
- 119   1              _pop_(SFRPI);
- 120   1      }
- 121          
- 122          
- 123          u16 time_count = 0;
- 124          u16 time_second = 0;
- 125          u16 time_second_old = 0;
- 126          u16 time_min = 0;
- 127          u16 time_min_old = 0;
- 128          u16 time_system = 0;
- 129          u16 time_tick = 0;
- 130          /***********************************************************************************
- 131          Function:       void INT_T0(void)
- 132          Description:    T0 Interrupt handler
- 133          Input:
- 134          Output:
- 135          *************************************************************************************/
- 136          void INT_T0(void) interrupt INT_VECTOR_T0  // Timer 1ms
- 137          {
- 138   1              TH0 = TIMER_12T_1ms_TH;
- 139   1              TL0 = TIMER_12T_1ms_TL;
- 140   1              time_system++;
- 141   1              time_tick++;
+ 117   2                      {
+ 118   3                              Uart0RxIn = 0;
+ 119   3                      }
+ 120   2              }
+ 121   1              _pop_(SFRPI);
+ 122   1      }
+ 123          
+ 124          
+ 125          u16 time_count = 0;
+ 126          u16 time_second = 0;
+ 127          u16 time_second_old = 0;
+ 128          u16 time_min = 0;
+ 129          u16 time_min_old = 0;
+ 130          u16 time_system = 0;
+ 131          /***********************************************************************************
+ 132          Function:       void INT_T0(void)
+ 133          Description:    T0 Interrupt handler
+ 134          Input:
+ 135          Output:
+ 136          *************************************************************************************/
+ 137          void INT_T0(void) interrupt INT_VECTOR_T0  // Timer 1ms
+ 138          {
+ 139   1              TH0 = TIMER_12T_1ms_TH;
+ 140   1              TL0 = TIMER_12T_1ms_TL;
+ 141   1              time_system++;
  142   1              time_count++;
  143   1              if (time_count >= 999)
  144   1              {
@@ -190,7 +190,7 @@ line level    source
  176   2                      i = Uart0TxIn;
  177   2                      TxBuf[i] = tByte;
  178   2                      i++;
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 4   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 4   
 
  179   2                      if (i >= UART0_TX_BUFF_SIZE)
  180   2                      {
@@ -254,7 +254,7 @@ line level    source
  238   2                      _nop_();
  239   2      #endif
  240   2      #if (MCU_CPUCLK>=24000000)
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 5   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 5   
 
  241   2                      _nop_();
  242   2                      _nop_();
@@ -313,45 +313,45 @@ line level    source
  295   1              PORT_SetP3QuasiBi(BIT0 | BIT1);  // rx tx
  296   1              //Pin
  297   1              PORT_SetP3OpenDrain(BIT4); // BTN
- 298   1              PORT_SetP2AInputOnly(BIT4); // ZX_BL
- 299   1              PORT_SetP2PushPull(BIT2); // relay
- 300   1              PORT_SetP6PushPull(BIT0 | BIT1); // led
- 301   1      
- 302   1      }
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 6   
+ 298   1              PORT_SetP6OpenDrain(BIT1); // btn test
+ 299   1              PORT_SetP2AInputOnly(BIT4); // ZX_BL
+ 300   1              PORT_SetP2PushPull(BIT2); // relay
+ 301   1              PORT_SetP6PushPull(BIT0 | BIT1); // led
+ 302   1      
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 6   
 
- 303          
- 304          /***********************************************************************************
- 305          Function:       void InitInterrupt()
- 306          Description:    Initialize Interrupt
- 307          Input:
- 308          Output:
- 309          *************************************************************************************/
- 310          void InitInterrupt(void)
- 311          {
- 312   1              INT_EnTIMER0(); // Enable Timer0 interrupt
- 313   1              INT_EnUART0();  // Enable UART0 interrupt
- 314   1              INT_EnAll();    // Enable global interrupt
- 315   1      }
- 316          
- 317          /***********************************************************************************
- 318          Function:       void InitUart0_S0BRG()
- 319          Description:    Initialize Uart0, The source of baud rate was S0BRG
- 320          Input:
- 321          Output:
- 322          *************************************************************************************/
- 323          void InitUart0_S0BRG(void)
- 324          {
- 325   1              UART0_SetAccess_S0CR1();        // Enable access S0CR1
- 326   1              UART0_SetMode8bitUARTVar(); // UART0 Mode: 8-bit, Variable B.R.
- 327   1              UART0_EnReception();            // Enable reception
- 328   1              UART0_SetBRGFromS0BRG();        // B.R. source: S0BRG
- 329   1              UART0_SetS0BRGBaudRateX2(); // S0BRG x2
- 330   1              UART0_SetS0BRGSelSYSCLK();      // S0BRG clock source: SYSCLK
- 331   1      
- 332   1              // Sets B.R. value
- 333   1              UART0_SetS0BRGValue(S0BRG_BRGRL_115200_2X_24000000_1T);
- 334   1      
+ 303   1      }
+ 304          
+ 305          /***********************************************************************************
+ 306          Function:       void InitInterrupt()
+ 307          Description:    Initialize Interrupt
+ 308          Input:
+ 309          Output:
+ 310          *************************************************************************************/
+ 311          void InitInterrupt(void)
+ 312          {
+ 313   1              INT_EnTIMER0(); // Enable Timer0 interrupt
+ 314   1              INT_EnUART0();  // Enable UART0 interrupt
+ 315   1              INT_EnAll();    // Enable global interrupt
+ 316   1      }
+ 317          
+ 318          /***********************************************************************************
+ 319          Function:       void InitUart0_S0BRG()
+ 320          Description:    Initialize Uart0, The source of baud rate was S0BRG
+ 321          Input:
+ 322          Output:
+ 323          *************************************************************************************/
+ 324          void InitUart0_S0BRG(void)
+ 325          {
+ 326   1              UART0_SetAccess_S0CR1();        // Enable access S0CR1
+ 327   1              UART0_SetMode8bitUARTVar(); // UART0 Mode: 8-bit, Variable B.R.
+ 328   1              UART0_EnReception();            // Enable reception
+ 329   1              UART0_SetBRGFromS0BRG();        // B.R. source: S0BRG
+ 330   1              UART0_SetS0BRGBaudRateX2(); // S0BRG x2
+ 331   1              UART0_SetS0BRGSelSYSCLK();      // S0BRG clock source: SYSCLK
+ 332   1      
+ 333   1              // Sets B.R. value
+ 334   1              UART0_SetS0BRGValue(S0BRG_BRGRL_115200_2X_24000000_1T);  // baund 115200
  335   1              UART0_EnS0BRG(); // Enable S0BRG
  336   1      }
  337          
@@ -382,7 +382,7 @@ line level    source
  362          
  363          Output:
  364          *************************************************************************************/
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 7   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 7   
 
  365          void IAP_ErasePage(u8 ByteAddr)
  366          {
@@ -446,7 +446,7 @@ line level    source
  424   1              IFMT = ISP_WRITE;               // write
  425   1              ISPCR = 0x80;                   // Enable ISP/IAP
  426   1                                                              //              CheckTrapFlag();
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 8   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 8   
 
  427   1              SCMD = 0x46;
  428   1              //              CheckTrapFlag();
@@ -510,7 +510,7 @@ line level    source
  486   1              while(SPI_ChkCompleteFlag()==0);                                // Wait complete
  487   1              SPI_ClearCompleteFlag();                                                // Clear flag
  488   1              return SPI_GetData();                                                   // Return data
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 9   
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 9   
 
  489   1      }
  490          
@@ -574,7 +574,7 @@ line level    source
                       // IHRCO, MCK=CKMIx4, OSCin=IHRCO
                       CLK_SetCKCON2(ENABLE_IHRCO|MCK_CKMI_X4|OSCIn_IHRCO);
               #endif
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 10  
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 10  
 
  551   1      #endif
  552   1      
@@ -638,7 +638,7 @@ line level    source
  610   1      
  611   1      
  612   1      #if (MCU_SYSCLK==44236800)
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 11  
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 11  
 
                       // SysClk=44.2368MHz CpuClk=22.1184MHz
                       CLK_SetCKCON0(IHRCO_110592MHz|CPUCLK_SYSCLK_DIV_1|SYSCLK_MCKDO_DIV_1|ENABLE_CKM|CKM_OSCIN_DIV_2);
@@ -698,65 +698,57 @@ line level    source
  668   1              vsprintf( __stream, __format, __local_argv );
  669   1              va_end( __local_argv );
  670   1              Uart0SendStr(Buff_print);
- 671   1      
- 672   1      }
- 673          
- 674          void RD_Send_Byte_SPI(u8 data_b){
-C51 COMPILER V9.01   MAIN                                                                  12/31/2024 16:06:34 PAGE 12  
+ 671   1      }
+ 672          
+ 673          void RD_Send_Byte_SPI(u8 data_b){
+ 674   1                      SPI_nSS=0;                      
+C51 COMPILER V9.01   MAIN                                                                  01/03/2025 13:13:34 PAGE 12  
 
- 675   1                      SPI_nSS=0;                      
- 676   1                      SPITransceiver(data_b); 
- 677   1                      SPI_nSS=1;
- 678   1      }
- 679          void RD_Send_String_SPI(u8 *data_str){
- 680   1              while(*data_str != NULL){
- 681   2                      RD_Send_Byte_SPI(*data_str++);
- 682   2              }
- 683   1      }
+ 675   1                      SPITransceiver(data_b); 
+ 676   1                      SPI_nSS=1;
+ 677   1      }
+ 678          void RD_Send_String_SPI(u8 *data_str){
+ 679   1              while(*data_str != NULL){
+ 680   2                      RD_Send_Byte_SPI(*data_str++);
+ 681   2              }
+ 682   1      }
+ 683          
  684          
- 685          
- 686          xdata int8_t data_sendx[6] = {12, 123, 15, 16, 17, 18};
- 687          // int xxx = 123;
- 688          // int xxx2 = 13;
- 689          
- 690          void main()
- 691          {
- 692   1          InitSystem();
- 693   1              /*====================UART========================*/
- 694   1              Uart0RxIn = 0;
- 695   1              Uart0RxOut = 0;
- 696   1              Uart0TxIn = 0;
- 697   1              Uart0TxOut = 0;
- 698   1              bUart0TxFlag = 0;
- 699   1              /*================================================*/
- 700   1              DelayXms(1000);
- 701   1              Uart0SendStr("hello\n");
- 702   1              
- 703   1              
- 704   1          while(1)
- 705   1          {   
- 706   2      
- 707   2                      WDT_Clear();
- 708   2      
- 709   2                      rd_print("arr: %d %d %d %d %d %d\n", data_sendx[0], data_sendx[1], data_sendx[2], data_sendx[3], data_se
-             -ndx[4], data_sendx[5]);
- 710   2      
- 711   2                      rd_print("helloaaa\n\n");
- 712   2                      
- 713   2                      DelayXms(1500);
- 714   2                      
- 715   2          }
- 716   1      }
- 717          
- 718          
+ 685          xdata uint8_t data_sendx[3] = {0x01, 0x02, 0x03};
+ 686          
+ 687          
+ 688          void main()
+ 689          {
+ 690   1          InitSystem();
+ 691   1              /*====================UART========================*/
+ 692   1              Uart0RxIn = 0;
+ 693   1              Uart0RxOut = 0;
+ 694   1              Uart0TxIn = 0;
+ 695   1              Uart0TxOut = 0;
+ 696   1              bUart0TxFlag = 0;
+ 697   1              /*================================================*/
+ 698   1              DelayXms(1000);
+ 699   1              Uart0SendStr("init done\n\n");
+ 700   1              
+ 701   1              
+ 702   1          while(1)
+ 703   1          {   
+ 704   2      
+ 705   2                      WDT_Clear();    
+ 706   2                      RD_Scan_Btn();
+ 707   2                      //DelayXms(1000);
+ 708   2          }
+ 709   1      }
+ 710          
+ 711          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1013    ----
-   CONSTANT SIZE    =     74    ----
-   XDATA SIZE       =     79      32
+   CODE SIZE        =    971    ----
+   CONSTANT SIZE    =     44    ----
+   XDATA SIZE       =     76      32
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     18      27
+   DATA SIZE        =     16      27
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      1       3
 END OF MODULE INFORMATION.

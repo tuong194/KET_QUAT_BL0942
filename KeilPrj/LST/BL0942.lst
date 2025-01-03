@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   BL0942                                                                12/31/2024 16:06:34 PAGE 1   
+C51 COMPILER V9.01   BL0942                                                                01/03/2025 13:13:34 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE BL0942
@@ -10,71 +10,209 @@ line level    source
 
    1          #include "./BL0942.H"  // SPI hỗ trợ max 900kHz
    2          
-   3          /*
-   4          void RD_Unlock_Send(void){
-   5              uint8_t data_send[6] = {0};
-   6              uint16_t CRC_Temp = (0xA8 + USR_WRPROT + 0x55);
-   7              uint8_t CRC_Check = ~(CRC_Temp & 0xff);
-   8              data_send[0] = 0xA8;
-   9              data_send[1] = USR_WRPROT;
-  10              data_send[2] = 0x00;
-  11              data_send[3] = 0x00;
-  12              data_send[4] = 0x55;
-  13              data_send[5] = CRC_Check;
-  14              RD_Send_String_SPI(data_send);
-  15          }
-  16          
-  17          void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w){
-  18              uint8_t data_send[6] = {0};
-  19              uint16_t CRC_Temp = 0xA8 + reg_addr + data_w[0] + data_w[1] + data_w[2];
-  20              uint8_t CRC_Check = ~(CRC_Temp & 0xff);
-  21              data_send[0] = 0xA8;
-  22              data_send[1] = reg_addr;
-  23              data_send[2] = data_w[0];
-  24              data_send[3] = data_w[1];
-  25              data_send[4] = data_w[2];
-  26              data_send[5] = CRC_Check;
-  27              RD_Send_String_SPI(data_send);
-  28          }
-  29          
-  30          void RD_Read_Data_SPI(uint8_t reg_addr){
-  31                  //uint8_t i = 0;
-  32              //xdata uint8_t Buff_print[30];
-  33              uint8_t *ptrRec;
-  34              uint8_t rx_data[6] = {0};
-  35              uint8_t tx_data[6] = {0};
-  36              uint16_t CRC_Temp = 0x58 + reg_addr;
-  37              uint8_t CRC_Check = ~(CRC_Temp & 0xff);
-  38              tx_data[0] = 0x58;
-  39              tx_data[1] = reg_addr;
-  40              tx_data[2] = 0x00;
-  41              tx_data[3] = 0x00;
-  42              tx_data[4] = 0x00;
-  43              tx_data[5] = CRC_Check;
-  44              ptrRec = &rx_data[0]; 
-  45              RD_Send_String_SPI(tx_data);
-  46              while (GET_DATA_SPI()!= NULL)
-  47              {
-  48                 *ptrRec++ = GET_DATA_SPI();
-  49              }
-  50              
-  51              rd_print("Data rec reg 0x%02X: ", reg_addr);
-  52              for(i=0; i<6; i++){
-  53                 rd_print("%d ", rx_data[0]);
-  54              }
-C51 COMPILER V9.01   BL0942                                                                12/31/2024 16:06:34 PAGE 2   
+   3          extern u16 time_system;
+   4          xdata u16 time_scan_btn_old = 0;
+   5          xdata u16 time_scan_btn_new = 0;
+   6          xdata u16 time_press_start = 0;
+   7          xdata u16 time_count_press = 0;
+   8          xdata u16 time_start_check_num_btn = 0;
+   9          xdata u16 time_count_check_num_btn = 0;
+  10          xdata u8 count_btn = 0;  // so lan nhan 
+  11          xdata u8 BTN_STT_NEW = 0;
+  12          xdata u8 BTN_STT_OLD = 0;
+  13          xdata u8 btn_stt = 0;
+  14          xdata u8 check_press = 0; // nhan don hoac nhan giu
+  15          xdata u8 check_hold_btn = 0;
+  16          xdata u8 have_press = 0;
+  17          
+  18          uint8_t get_btn(void){
+  19   1          uint8_t temp_get_btn = 0;
+  20   1          if(RD_PIN_BTN==0){
+  21   2              temp_get_btn=0;
+  22   2          }else{
+  23   2              temp_get_btn = 1;
+  24   2          }
+  25   1          return temp_get_btn;
+  26   1      }
+  27          
+  28          u16 get_time_ms(void){
+  29   1          return time_system;
+  30   1      }
+  31          void RD_Scan_Btn(void){
+  32   1          u16 temp_get_time = 0;
+  33   1          temp_get_time = get_time_ms();
+  34   1          WDT_Clear();
+  35   1          time_scan_btn_new = temp_get_time;
+  36   1          if(time_scan_btn_new < time_scan_btn_old) time_scan_btn_old = time_scan_btn_new; // tran
+  37   1          if(time_scan_btn_new - time_scan_btn_old > 10){ // quet phim 10ms/1lan
+  38   2              BTN_STT_NEW = get_btn();
+  39   2              if(BTN_STT_NEW == 0 && BTN_STT_OLD == 1){ // nhan nut
+  40   3                  time_press_start = temp_get_time;
+  41   3                  btn_stt = 1;
+  42   3              }else if(BTN_STT_NEW == 1 && BTN_STT_OLD == 0){ // nha nut
+  43   3                  if(time_count_press >= 35 && time_count_press < 600){
+  44   4                      if(check_hold_btn == 1){ 
+  45   5                          rd_print("nha giu\n");
+  46   5                          check_hold_btn = 0;
+  47   5                      }else{
+  48   5                          have_press = 1;
+  49   5                          check_press = 1;
+  50   5                      }
+  51   4                  }else{
+  52   4                      if(time_count_press >= 600){
+  53   5                          rd_print("nha giu\n");
+  54   5                          check_hold_btn = 0;
+C51 COMPILER V9.01   BL0942                                                                01/03/2025 13:13:34 PAGE 2   
 
-  55              rd_print("\n");  
-  56          }
-  57          */
+  55   5                      }
+  56   4                  }
+  57   3                  btn_stt = 0;
+  58   3              }
+  59   2              /*check hold btn*/
+  60   2              if(btn_stt){
+  61   3                  if(time_press_start > temp_get_time){
+  62   4                      time_count_press = (65535 - time_press_start) + temp_get_time;
+  63   4                  }else{
+  64   4                      time_count_press = temp_get_time - time_press_start;
+  65   4                  }
+  66   3                  if(time_count_press >= 1200){
+  67   4                      have_press = 1;
+  68   4                      check_press = 2;
+  69   4                      time_press_start = temp_get_time - 700; // 500ms scan 1 phat
+  70   4                  }
+  71   3              }
+  72   2              BTN_STT_OLD = BTN_STT_NEW;
+  73   2              time_scan_btn_old = time_scan_btn_new;
+  74   2          }
+  75   1          /*xu ly nut nhan*/
+  76   1          if(have_press){
+  77   2              if(check_press == 1){
+  78   3                  rd_print("an 1 phat\n");
+  79   3                  time_start_check_num_btn = temp_get_time;
+  80   3                  count_btn++;
+  81   3                  check_press = 0;
+  82   3              }else if(check_press == 2){
+  83   3                  rd_print("an giu ne\n");
+  84   3                  count_btn = 0;
+  85   3                  check_hold_btn = 1;
+  86   3                  check_press = 0;
+  87   3              }
+  88   2              
+  89   2              have_press = 0;
+  90   2          }
+  91   1      
+  92   1          /*kiem tra so lan nhan*/
+  93   1          if(time_start_check_num_btn > temp_get_time){
+  94   2              time_count_check_num_btn = (65535 - time_start_check_num_btn) + temp_get_time;
+  95   2          }else{
+  96   2              time_count_check_num_btn = temp_get_time - time_start_check_num_btn;
+  97   2          }
+  98   1          if(count_btn){
+  99   2              if(time_count_check_num_btn > 600){
+ 100   3                  if(count_btn == 1){
+ 101   4                      rd_print("1 phat\n");
+ 102   4                  }else if(count_btn == 2){
+ 103   4                      rd_print("2 phat\n");
+ 104   4                  }else if(count_btn == 3){
+ 105   4                      rd_print("3 phat\n");
+ 106   4                  }
+ 107   3                  count_btn = 0;
+ 108   3                  time_count_check_num_btn = 0;
+ 109   3                  time_start_check_num_btn = temp_get_time;
+ 110   3              }
+ 111   2          }else{
+ 112   2              time_start_check_num_btn = temp_get_time;
+ 113   2          }
+ 114   1          
+ 115   1      }
+ 116          
+C51 COMPILER V9.01   BL0942                                                                01/03/2025 13:13:34 PAGE 3   
+
+ 117          void RD_Unlock_Send(void){
+ 118   1          uint8_t data_send[6] = {0};
+ 119   1          uint16_t CRC_Temp = (0xA8 + USR_WRPROT + 0x55);
+ 120   1          uint8_t CRC_Check = ~(CRC_Temp & 0xff);
+ 121   1          data_send[0] = 0xA8;
+ 122   1          data_send[1] = USR_WRPROT;
+ 123   1          data_send[2] = 0x00;
+ 124   1          data_send[3] = 0x00;
+ 125   1          data_send[4] = 0x55;
+ 126   1          data_send[5] = CRC_Check;
+ 127   1          RD_Send_String_SPI(data_send);
+ 128   1      }
+ 129          
+ 130          void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w){
+ 131   1          uint8_t i =0;
+ 132   1          uint8_t data_send[6] = {0};
+ 133   1          uint16_t CRC_Temp = 0xA8 + reg_addr + data_w[0] + data_w[1] + data_w[2];
+ 134   1          uint8_t CRC_Check = ~(CRC_Temp & 0xff);
+ 135   1          data_send[0] = 0xA8;
+ 136   1          data_send[1] = reg_addr;
+ 137   1          data_send[2] = data_w[0];
+ 138   1          data_send[3] = data_w[1];
+ 139   1          data_send[4] = data_w[2];
+ 140   1          data_send[5] = CRC_Check;
+ 141   1          RD_Send_String_SPI(data_send);
+ 142   1      
+ 143   1      #if RD_LOG
+ 144   1          rd_print("data send: ");
+ 145   1          for(i=0;i<6;i++){
+ 146   2              RD_PRINT_HEX(data_send[i]);
+ 147   2          }
+ 148   1          rd_print("\n");
+ 149   1      #endif
+ 150   1      
+ 151   1      }
+ 152          
+ 153          void RD_Read_Data_SPI(uint8_t reg_addr){
+ 154   1              uint8_t i = 0;
+ 155   1          //xdata uint8_t Buff_print[30];
+ 156   1          uint8_t *ptrRec;
+ 157   1          uint8_t rx_data[6] = {0};
+ 158   1          uint8_t tx_data[6] = {0};
+ 159   1          uint16_t CRC_Temp = 0x58 + reg_addr;
+ 160   1          uint8_t CRC_Check = ~(CRC_Temp & 0xff);
+ 161   1          tx_data[0] = 0x58;
+ 162   1          tx_data[1] = reg_addr;
+ 163   1          tx_data[2] = 0x00;
+ 164   1          tx_data[3] = 0x00;
+ 165   1          tx_data[4] = 0x00;
+ 166   1          tx_data[5] = CRC_Check;
+ 167   1          ptrRec = &rx_data[0]; 
+ 168   1          RD_Send_String_SPI(tx_data);
+ 169   1          while (GET_DATA_SPI()!= NULL)
+ 170   1          {
+ 171   2             *ptrRec++ = GET_DATA_SPI();
+ 172   2          }
+ 173   1          
+ 174   1      #if RD_LOG
+ 175   1          rd_print("Data rec reg 0x%02X: ", (unsigned int)reg_addr);
+ 176   1          for(i=0; i<6; i++){
+ 177   2             RD_PRINT_HEX(rx_data[i]);
+ 178   2          }
+C51 COMPILER V9.01   BL0942                                                                01/03/2025 13:13:34 PAGE 4   
+
+ 179   1          rd_print("\n");  
+ 180   1      #endif
+ 181   1      
+ 182   1      }
+ 183          
+ 184          void RD_setup_BL0942(void){
+ 185   1          uint8_t Set_CF_ZX[3] ={0x00,0x00,0x23}; // 0010 0011: ZX 10, CF2 00, CF1 11
+ 186   1          uint8_t Set_Gain[3] ={0x00,0x00,0x03};
+ 187   1          uint8_t Set_Soft_Reset[3] ={0x5a,0x5a,0x5a};
+ 188   1          RD_Write_Data(GAIN_CR, Set_Gain);
+ 189   1          RD_Write_Data(SOFT_RESET, Set_Soft_Reset);
+ 190   1          RD_Write_Data(REG_OT_FUNX, Set_CF_ZX);
+ 191   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   ----    ----
-   CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   ----    ----
+   CODE SIZE        =   1061    ----
+   CONSTANT SIZE    =    132    ----
+   XDATA SIZE       =     19    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----    ----
+   DATA SIZE        =   ----      45
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

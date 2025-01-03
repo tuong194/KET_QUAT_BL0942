@@ -27,6 +27,8 @@
 #include ".\include\API_Macro_MG82F6D17.H"
 #include ".\include\API_Uart_BRGRL_MG82F6D17.H"
 
+#include "./BL0942/BL0942.h"
+
 #define UART0_RX_BUFF_SIZE 32
 #define UART0_TX_BUFF_SIZE 32
 xdata u8 RcvBuf[UART0_RX_BUFF_SIZE];
@@ -126,7 +128,6 @@ u16 time_second_old = 0;
 u16 time_min = 0;
 u16 time_min_old = 0;
 u16 time_system = 0;
-u16 time_tick = 0;
 /***********************************************************************************
 Function:   	void INT_T0(void)
 Description:	T0 Interrupt handler
@@ -138,7 +139,6 @@ void INT_T0(void) interrupt INT_VECTOR_T0  // Timer 1ms
 	TH0 = TIMER_12T_1ms_TH;
 	TL0 = TIMER_12T_1ms_TL;
 	time_system++;
-	time_tick++;
 	time_count++;
 	if (time_count >= 999)
 	{
@@ -295,6 +295,7 @@ void InitPort(void)
 	PORT_SetP3QuasiBi(BIT0 | BIT1);  // rx tx
 	//Pin
 	PORT_SetP3OpenDrain(BIT4); // BTN
+	PORT_SetP6OpenDrain(BIT1); // btn test
 	PORT_SetP2AInputOnly(BIT4); // ZX_BL
 	PORT_SetP2PushPull(BIT2); // relay
 	PORT_SetP6PushPull(BIT0 | BIT1); // led
@@ -330,8 +331,7 @@ void InitUart0_S0BRG(void)
 	UART0_SetS0BRGSelSYSCLK();	// S0BRG clock source: SYSCLK
 
 	// Sets B.R. value
-	UART0_SetS0BRGValue(S0BRG_BRGRL_115200_2X_24000000_1T);
-
+	UART0_SetS0BRGValue(S0BRG_BRGRL_115200_2X_24000000_1T);  // baund 115200
 	UART0_EnS0BRG(); // Enable S0BRG
 }
 
@@ -668,7 +668,6 @@ void rd_print(const char *__format, ...){
   	vsprintf( __stream, __format, __local_argv );
   	va_end( __local_argv );
 	Uart0SendStr(Buff_print);
-
 }
 
 void RD_Send_Byte_SPI(u8 data_b){
@@ -683,9 +682,8 @@ void RD_Send_String_SPI(u8 *data_str){
 }
 
 
-xdata int8_t data_sendx[6] = {12, 123, 15, 16, 17, 18};
-// int xxx = 123;
-// int xxx2 = 13;
+xdata uint8_t data_sendx[3] = {0x01, 0x02, 0x03};
+
 
 void main()
 {
@@ -698,20 +696,15 @@ void main()
 	bUart0TxFlag = 0;
 	/*================================================*/
 	DelayXms(1000);
-	Uart0SendStr("hello\n");
+	Uart0SendStr("init done\n\n");
 	
 	
     while(1)
     {	
 
-		WDT_Clear();
-
-		rd_print("arr: %d %d %d %d %d %d\n", data_sendx[0], data_sendx[1], data_sendx[2], data_sendx[3], data_sendx[4], data_sendx[5]);
-
-		rd_print("helloaaa\n\n");
-		
-		DelayXms(1500);
-		
+		WDT_Clear();	
+		RD_Scan_Btn();
+		//DelayXms(1000);
     }
 }
 
