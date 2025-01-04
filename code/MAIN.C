@@ -42,7 +42,7 @@ bit bUart0TxFlag;
 #define IAP_END_ADDRESS 0x3400
 #define SIZE_DATA 9
 xdata uint8_t data_flash[SIZE_DATA];
-
+extern u8 rec_data[6];
 
 /*************************************************
 Set SysClk (MAX.50MHz) (MAX.50MHz)
@@ -52,7 +52,7 @@ Selection:
 	29491200,32000000,
 	44236800,48000000
 *************************************************/
-#define MCU_SYSCLK		24000000
+#define MCU_SYSCLK		12000000
 
 /*************************************************/
 /*************************************************
@@ -78,6 +78,28 @@ set CpuClk (MAX.36MHz)
 
 #define SPI_nSS		P33
 
+#if MCU_SYSCLK == 24000000
+#define RD_BAUND      S0BRG_BRGRL_115200_2X_24000000_1T     // 115200
+#define RD_SPI_CLOCK  SPI_CLK_SYSCLK_32
+#elif MCU_SYSCLK == 12000000
+#define RD_BAUND      S0BRG_BRGRL_9600_2X_12000000_1T       //9600
+#define RD_SPI_CLOCK  SPI_CLK_SYSCLK_16
+#endif
+
+/***********************************************************************************
+Function:   void INT_SPI(void)
+Description:SPI Interrupt handler
+		 
+Input:   
+Output:     
+*************************************************************************************/
+void INT_SPI() interrupt INT_VECTOR_SPI
+{
+	BYTE i;
+	i=SPDAT;				// read current SPI data
+	SPSTAT = SPSTAT |SPIF;	// clear flag
+	SPDAT=i+1; 				// SPI data +1£¬for next trans
+}
 
 /***********************************************************************************
 Function:   	void INT_UART0(void)
@@ -295,7 +317,6 @@ void InitPort(void)
 	PORT_SetP3QuasiBi(BIT0 | BIT1);  // rx tx
 	//Pin
 	PORT_SetP3OpenDrain(BIT4); // BTN
-	PORT_SetP6OpenDrain(BIT1); // btn test
 	PORT_SetP2AInputOnly(BIT4); // ZX_BL
 	PORT_SetP2PushPull(BIT2); // relay
 	PORT_SetP6PushPull(BIT0 | BIT1); // led
@@ -312,6 +333,7 @@ void InitInterrupt(void)
 {
 	INT_EnTIMER0(); // Enable Timer0 interrupt
 	INT_EnUART0();	// Enable UART0 interrupt
+	//INT_EnSPI();   // Enable SPI interrupt
 	INT_EnAll();	// Enable global interrupt
 }
 
@@ -331,7 +353,7 @@ void InitUart0_S0BRG(void)
 	UART0_SetS0BRGSelSYSCLK();	// S0BRG clock source: SYSCLK
 
 	// Sets B.R. value
-	UART0_SetS0BRGValue(S0BRG_BRGRL_115200_2X_24000000_1T);  // baund 115200
+	UART0_SetS0BRGValue(RD_BAUND);  // baund 115200
 	UART0_EnS0BRG(); // Enable S0BRG
 }
 
@@ -466,7 +488,7 @@ void InitSPI(void)
 	
 	SPI_Enable();									// Enable SPI
 	SPI_SelectMASTERByMSTRbit();					// Set to MASTER
-	SPI_SetClock(SPI_CLK_SYSCLK_32);					// Set Clock SYSCLK/32 = 24M/32= 750 KHz
+	SPI_SetClock(RD_SPI_CLOCK);					    // Set Clock SYSCLK/32 = 24M/32= 750 KHz
 	SPI_SetCPOL_0();								// CPOL=0 
 	SPI_SetDataMSB();								// Data MSB
 	SPI_SetCPHA_1();								// CPHA=1
@@ -671,19 +693,31 @@ void rd_print(const char *__format, ...){
 }
 
 void RD_Send_Byte_SPI(u8 data_b){
-		SPI_nSS=0;			
+		//SPI_nSS=0;			
 		SPITransceiver(data_b); 
-		SPI_nSS=1;
+		//SPI_nSS=1;
 }
+
+
 void RD_Send_String_SPI(u8 *data_str){
-	while(*data_str != NULL){
-		RD_Send_Byte_SPI(*data_str++);
+	// while(*data_str != NULL){
+	// 	RD_Send_Byte_SPI(*data_str++);
+	// }
+	u8 i = 0;
+	SPI_nSS=0;
+	for(i=0; i<6; i++){
+		//RD_Send_Byte_SPI(data_str[i]);
+		rec_data[i] = SPITransceiver(data_str[i]);
 	}
+	SPI_nSS=1;
 }
 
-
-xdata uint8_t data_sendx[3] = {0x01, 0x02, 0x03};
-
+// u32 test_U = 0;
+// u8 test_buff[3] = {0x36, 0x24, 0x0B};
+// void tes_U_rd(void){
+// 	test_U = ((u32)test_buff[0] << 16) | ((u32)test_buff[1] << 8) | ((u32)test_buff[2]);
+// 	rd_print("test U = %lu\n", test_U);
+// }
 
 void main()
 {
@@ -697,14 +731,20 @@ void main()
 	/*================================================*/
 	DelayXms(1000);
 	Uart0SendStr("init done\n\n");
-	
+	P60 = 1;
+	P61 = 0;
+	DelayXms(500);
+
 	
     while(1)
     {	
-
 		WDT_Clear();	
-		RD_Scan_Btn();
-		//DelayXms(1000);
+		
+		rd_loop();
+		
+		DelayXms(3000);
+		P60 =!P60;
+		P61 =!P61;
     }
 }
 

@@ -15,6 +15,10 @@ xdata u8 check_press = 0; // nhan don hoac nhan giu
 xdata u8 check_hold_btn = 0;
 xdata u8 have_press = 0;
 
+xdata u8 flag_start = 0;
+u8 rec_data[6] = {0};
+
+
 uint8_t get_btn(void){
     uint8_t temp_get_btn = 0;
     if(RD_PIN_BTN==0){
@@ -140,21 +144,21 @@ void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w){
     data_send[5] = CRC_Check;
     RD_Send_String_SPI(data_send);
 
-#if RD_LOG
+#if RD_LOG 
     rd_print("data send: ");
     for(i=0;i<6;i++){
         RD_PRINT_HEX(data_send[i]);
     }
     rd_print("\n");
 #endif
-
 }
 
-void RD_Read_Data_SPI(uint8_t reg_addr){
+
+void RD_Read_Data_SPI(uint8_t reg_addr){  // get data ko dau
+    u32 V_RMS = 0;
+    float temp_U = 0;
+    u32 RD_U_HD = 0;
 	uint8_t i = 0;
-    //xdata uint8_t Buff_print[30];
-    uint8_t *ptrRec;
-    uint8_t rx_data[6] = {0};
     uint8_t tx_data[6] = {0};
     uint16_t CRC_Temp = 0x58 + reg_addr;
     uint8_t CRC_Check = ~(CRC_Temp & 0xff);
@@ -163,29 +167,49 @@ void RD_Read_Data_SPI(uint8_t reg_addr){
     tx_data[2] = 0x00;
     tx_data[3] = 0x00;
     tx_data[4] = 0x00;
-    tx_data[5] = CRC_Check;
-    ptrRec = &rx_data[0]; 
+    tx_data[5] = 0x00;//CRC_Check;
     RD_Send_String_SPI(tx_data);
-    while (GET_DATA_SPI()!= NULL)
-    {
-       *ptrRec++ = GET_DATA_SPI();
-    }
-    
+      
 #if RD_LOG
     rd_print("Data rec reg 0x%02X: ", (unsigned int)reg_addr);
     for(i=0; i<6; i++){
-       RD_PRINT_HEX(rx_data[i]);
+       RD_PRINT_HEX(rec_data[i]);
     }
-    rd_print("\n");  
+    rd_print("\n------------------------\n"); 
 #endif
-
+    V_RMS = ((u32)rec_data[2] << 16) | ((u32)rec_data[3] << 8) | ((u32)rec_data[4]);
+    temp_U = 2375.72118 / (73989*510);
+    RD_U_HD = V_RMS*temp_U;
+    //rd_print("temp U : %.7f \n", temp_U); 
+    rd_print("VRMS = %lu\n", V_RMS);
+    rd_print("U hieu dung : %ld V", RD_U_HD);
+    rd_print("\n------------------------\n\n");
+    memset(rec_data, 0, 6);
+     
+    /*get data*/
+    //CRC_Temp = 0x58 + reg_addr + rx_data[2] + rx_data[3] + rx_data[4];
+    //CRC_Check = ~(CRC_Temp & 0xff);
+    // if(CRC_Check == rx_data[5]){
+    //     data_read = (rx_data[2] << 16) | (rx_data[3] << 8) | (rx_data[4]) ;
+    //     rd_print("value: %ld\n", data_read);
+    //     return data_read;
+    // }
 }
 
 void RD_setup_BL0942(void){
-    uint8_t Set_CF_ZX[3] ={0x00,0x00,0x23}; // 0010 0011: ZX 10, CF2 00, CF1 11
-    uint8_t Set_Gain[3] ={0x00,0x00,0x03};
-    uint8_t Set_Soft_Reset[3] ={0x5a,0x5a,0x5a};
-    RD_Write_Data(GAIN_CR, Set_Gain);
-    RD_Write_Data(SOFT_RESET, Set_Soft_Reset);
-    RD_Write_Data(REG_OT_FUNX, Set_CF_ZX);
+        uint8_t Set_CF_ZX[3] ={0x00,0x00,0x23}; // 0010 0011: ZX 10, CF2 00, CF1 11
+        uint8_t Set_Gain[3] ={0x00,0x00,0x03};
+        uint8_t Set_Soft_Reset[3] ={0x5a,0x5a,0x5a};
+        RD_Write_Data(GAIN_CR, Set_Gain);
+        RD_Write_Data(SOFT_RESET, Set_Soft_Reset);
+        RD_Write_Data(REG_OT_FUNX, Set_CF_ZX);
+}
+
+void rd_loop(void){
+    if (flag_start == 0)
+    {
+        RD_setup_BL0942();
+        flag_start = 1;
+    }
+    RD_Read_Data_SPI(REG_VRMS);
 }

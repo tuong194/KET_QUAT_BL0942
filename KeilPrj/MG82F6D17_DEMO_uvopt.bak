@@ -27,7 +27,7 @@
     <TargetOption>
       <CLK51>25000000</CLK51>
       <OPTTT>
-        <gFlags>0</gFlags>
+        <gFlags>1</gFlags>
         <BeepAtEnd>1</BeepAtEnd>
         <RunSim>1</RunSim>
         <RunTarget>0</RunTarget>
@@ -158,12 +158,12 @@
       <GroupNumber>1</GroupNumber>
       <FileNumber>1</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>703</TopLine>
+      <CurrentLine>711</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\MAIN.C</PathWithFileName>
       <FilenameWithoutPath>MAIN.C</FilenameWithoutPath>
@@ -176,13 +176,39 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>2</CurrentLine>
+      <TopLine>175</TopLine>
+      <CurrentLine>175</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\BL0942\BL0942.c</PathWithFileName>
       <FilenameWithoutPath>BL0942.c</FilenameWithoutPath>
     </File>
   </Group>
+
+  <AlienFiles>
+    <PathWithFilename>E:\mgw\Code_Tuong\KETQUAT\CODE\BL0942\BL0942.H</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>23</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
 
   <AlienFiles>
     <PathWithFilename>E:\mgw\Code_Tuong\KETQUAT\CODE\INCLUDE\API_MACRO_MG82F6D17.H</PathWithFilename>
@@ -1551,13 +1577,13 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>2</ActiveTab>
+      <ActiveTab>0</ActiveTab>
       <Documents>
         <Doc>
           <Name>..\code\MAIN.C</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
+          <TopLine>703</TopLine>
+          <CurrentLine>711</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\.\INCLUDE\API_MACRO_MG82F6D17.H</Name>
@@ -1568,8 +1594,14 @@
         <Doc>
           <Name>..\code\BL0942\BL0942.c</Name>
           <ColumnNumber>0</ColumnNumber>
+          <TopLine>175</TopLine>
+          <CurrentLine>175</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>..\CODE\./BL0942/BL0942.H</Name>
+          <ColumnNumber>0</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>2</CurrentLine>
+          <CurrentLine>23</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>
