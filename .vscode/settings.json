@@ -2,6 +2,7 @@
     "files.associations": {
         "MAIN.C": "cpp",
         "bl0942.h": "c",
-        "API_Uart_BRGRL_MG82F6D17.H": "cpp"
+        "API_Uart_BRGRL_MG82F6D17.H": "cpp",
+        "algorithm": "cpp"
     }
 }

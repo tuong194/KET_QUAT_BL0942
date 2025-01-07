@@ -39,8 +39,9 @@ u8 Uart0TxIn = 0;
 u8 Uart0TxOut = 0;
 bit bUart0TxFlag;
 
-#define IAP_END_ADDRESS 0x3400
-#define SIZE_DATA 9
+#define IAP_END_ADDRESS   0x3400
+#define SIZE_DATA         RD_SIZE_FLASH
+
 xdata uint8_t data_flash[SIZE_DATA];
 extern u8 rec_data[6];
 
@@ -52,7 +53,7 @@ Selection:
 	29491200,32000000,
 	44236800,48000000
 *************************************************/
-#define MCU_SYSCLK		12000000
+#define MCU_SYSCLK		24000000
 
 /*************************************************/
 /*************************************************
@@ -469,12 +470,20 @@ void write_data_fash(void)
 	}
 }
 
-
 unsigned char read_data_flash(unsigned char j)
 {
 	unsigned char data_read;
 	data_read = IAP_ReadByteByMOVC(IAP_END_ADDRESS + j);
 	return data_read;
+}
+
+void read_all_flash(void){
+	u8 i = 0;
+	for (i = 0; i < SIZE_DATA; i++)
+	{
+		data_flash[i] = read_data_flash(i);
+	}
+	Data_Read = (data_bl0942 *)(data_flash[0]);
 }
 
 /***********************************************************************************
@@ -692,32 +701,23 @@ void rd_print(const char *__format, ...){
 	Uart0SendStr(Buff_print);
 }
 
-void RD_Send_Byte_SPI(u8 data_b){
+//void RD_Send_Byte_SPI(u8 data_b){
 		//SPI_nSS=0;			
-		SPITransceiver(data_b); 
+		//SPITransceiver(data_b); 
 		//SPI_nSS=1;
-}
+//}
 
 
 void RD_Send_String_SPI(u8 *data_str){
-	// while(*data_str != NULL){
-	// 	RD_Send_Byte_SPI(*data_str++);
-	// }
 	u8 i = 0;
 	SPI_nSS=0;
 	for(i=0; i<6; i++){
-		//RD_Send_Byte_SPI(data_str[i]);
 		rec_data[i] = SPITransceiver(data_str[i]);
 	}
 	SPI_nSS=1;
 }
 
-// u32 test_U = 0;
-// u8 test_buff[3] = {0x36, 0x24, 0x0B};
-// void tes_U_rd(void){
-// 	test_U = ((u32)test_buff[0] << 16) | ((u32)test_buff[1] << 8) | ((u32)test_buff[2]);
-// 	rd_print("test U = %lu\n", test_U);
-// }
+
 
 void main()
 {
@@ -730,10 +730,10 @@ void main()
 	bUart0TxFlag = 0;
 	/*================================================*/
 	DelayXms(1000);
-	Uart0SendStr("init done\n\n");
+	rd_print("init done, size flash %u\n\n", (unsigned int)SIZE_DATA);
 	P60 = 1;
 	P61 = 0;
-	DelayXms(500);
+	DelayXms(3000);
 
 	
     while(1)
@@ -742,7 +742,7 @@ void main()
 		
 		rd_loop();
 		
-		DelayXms(3000);
+		DelayXms(5000);
 		P60 =!P60;
 		P61 =!P61;
     }

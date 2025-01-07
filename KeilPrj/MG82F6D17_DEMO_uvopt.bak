@@ -160,10 +160,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>67</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>703</TopLine>
-      <CurrentLine>711</CurrentLine>
+      <TopLine>715</TopLine>
+      <CurrentLine>739</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\MAIN.C</PathWithFileName>
       <FilenameWithoutPath>MAIN.C</FilenameWithoutPath>
@@ -1581,9 +1581,9 @@
       <Documents>
         <Doc>
           <Name>..\code\MAIN.C</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>703</TopLine>
-          <CurrentLine>711</CurrentLine>
+          <ColumnNumber>67</ColumnNumber>
+          <TopLine>715</TopLine>
+          <CurrentLine>739</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\.\INCLUDE\API_MACRO_MG82F6D17.H</Name>
