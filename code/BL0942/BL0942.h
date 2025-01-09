@@ -20,7 +20,7 @@
 #define REG_IRMS              (0x03)
 #define REG_VRMS              (0x04)
 
-#define RD_LOG                1
+#define RD_LOG                0
 #define RD_PIN_BTN            P34
 #define RD_LED_R              P60
 #define RD_LED_G              P61
@@ -30,20 +30,21 @@
 #define ON_LED(x)            (x = 0)
 #define OFF_LED(x)           (x = 1)
 #define BLINK_LED(x)         ((x)=!(x))
-#define RD_SIZE_FLASH        sizeof(data_bl0942)
+#define RD_SIZE_FLASH        sizeof(data_bl0942_t)
+#define SIZE_DATA            RD_SIZE_FLASH
 
 typedef struct{
-    float header;
+    u8 header;
     float U_hd;
     float I_hd;
-    float I_old;
     float P_hd;
-    float P_old;
     float Cos_Phi;
+    float P_old;
+    float I_old;
     u8 tail;
-}data_bl0942;
+}data_bl0942_t;
 
-extern data_bl0942 *Data_Read;
+extern data_bl0942_t *Data_Read;
 
 extern void DelayXms(u16 xMs);
 extern void RD_Send_String_SPI(u8 *data_str);
@@ -51,7 +52,7 @@ extern void rd_print(const char *__format, ...);
 extern void read_all_flash(void);
 extern void write_data_fash(void);
 
-// void RD_Init_flash(void);
+//void RD_Init_flash(void);
 //void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w);
 void RD_Send_Setup(uint8_t reg_addr, uint8_t *data_w);
 void RD_setup_BL0942(void);

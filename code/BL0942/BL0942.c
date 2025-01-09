@@ -21,21 +21,20 @@ xdata u32 U_in;
 xdata u32 I_in;
 xdata int32_t P_in;
 
-data_bl0942 *Data_Read;
+// xdata data_bl0942_t data_bl0942 = {0};
+data_bl0942_t *Data_Read ;
 
 void RD_Init_flash(void){
-    // read_all_flash();
-    // rd_print("header: ");
-    // RD_PRINT_HEX(Data_Read->header);
-    // rd_print(" tail: ");
-    // RD_PRINT_HEX(Data_Read->tail);
-    // rd_print("\n");
-    // if(Data_Read->header != 0x55 && Data_Read->tail != 0xaa){
-    //     rd_print("init fail\n");
-    //     Data_Read->header = 0x55;
-    //     Data_Read->tail = 0xaa;
-    // }
-    // write_data_fash();
+    read_all_flash();
+    rd_print("header: "); RD_PRINT_HEX(Data_Read->header);
+    rd_print("tail: "); RD_PRINT_HEX(Data_Read->tail);
+    rd_print("\n");
+    if(Data_Read->header != 0x55 && Data_Read->tail != 0xaa){
+        rd_print("init fail\n");
+        Data_Read->header = 0x55;
+        Data_Read->tail = 0xaa;
+    }
+    write_data_fash();
 }
 
 uint8_t get_btn(void)
@@ -247,11 +246,10 @@ int32_t RD_Read_Data_Signed_SPI(uint8_t reg_addr)
         {
             read_value |= 0xff000000; // mo rong bit dau
         }
-        rd_print("value = %ld \n", read_value);
-        rd_print("-----------------------------\n");
+        //rd_print("value = %ld \n", read_value);
+        //rd_print("-----------------------------\n");
         return read_value;
     }
-    //rd_print("-----------------------------\n");
     memset(rec_data, 0, 6);
     return 0;
 }
@@ -285,11 +283,13 @@ u32 RD_Read_Data_SPI(uint8_t reg_addr)
     {
         read_value = ((u32)rec_data[2] << 16) | ((u32)rec_data[3] << 8) | ((u32)rec_data[4]);
         memset(rec_data, 0, 6);
+#if RD_LOG
         rd_print("value = %lu\n", read_value);
         rd_print("-----------------------------\n");
+#endif
         return read_value;
     }
-    rd_print("-----------------------------\n");
+    //rd_print("-----------------------------\n");
     memset(rec_data, 0, 6);
     return 0;
 }
@@ -316,23 +316,26 @@ void rd_loop(void)
     }
     U_in = RD_Read_Data_SPI(REG_VRMS);
     temp_cal = 2375.72118f/(73989.0f * 510.0f); // temp_U //= (1.218*(390000*5 + 510)*0.001)
-    Data_Read->U_hd = U_in * temp_cal;
+    Data_Read->U_hd = 220.23;//U_in * temp_cal;
     rd_print("U hd: %.2f V, ", Data_Read->U_hd);
-    rd_print("temp_U = %.7f\n\n", temp_cal);
+    rd_print("temp_U = %.7f\n", temp_cal);
+    DelayXms(100);
 
     I_in = RD_Read_Data_SPI(REG_IRMS);
     temp_cal = 1.218 / 305978; // temp_I
-    Data_Read->I_hd = (I_in * temp_cal) / 2.3506;
+    Data_Read->I_hd = 0.07;//(I_in * temp_cal) / 2.3506;
     rd_print("I hd: %.4f A, ", Data_Read->I_hd);
-    rd_print("temp_I = %.7f\n\n", temp_cal);
+    rd_print("temp_I = %.7f\n", temp_cal);
+    DelayXms(100);
 
     P_in = RD_Read_Data_Signed_SPI(REG_WATT);
     temp_cal = 0.001604122; //=((1.218*1.218)*(390000*5 + 510))/(3537*0.001*510*1000*1000)  temp_P
-    Data_Read->P_hd = P_in * temp_cal;
-    rd_print("\nP hieu dung: %.3f W\n\n", Data_Read->P_hd);
+    Data_Read->P_hd = 7.87;//P_in * temp_cal;
+    rd_print("P hieu dung: %.3f W \n", Data_Read->P_hd);
+    DelayXms(100);
 
-    Data_Read->Cos_Phi = Data_Read->P_hd / (Data_Read->U_hd * Data_Read->I_hd);
-    rd_print("cos phi: %.3f radian\n\n", Data_Read->Cos_Phi);
+    Data_Read->Cos_Phi = (Data_Read->P_hd) / ((Data_Read->U_hd) * (Data_Read->I_hd));
+    rd_print("Cos phi : %.3f \n\n", Data_Read->Cos_Phi);
 
     // if (Data_Read->I_hd < 0.0001)
     // {

@@ -40,9 +40,9 @@ u8 Uart0TxOut = 0;
 bit bUart0TxFlag;
 
 #define IAP_END_ADDRESS   0x3400
-#define SIZE_DATA         RD_SIZE_FLASH
+//#define SIZE_DATA         RD_SIZE_FLASH
 
-xdata uint8_t data_flash[SIZE_DATA];
+xdata uint8_t data_flash[SIZE_DATA] = {0};
 extern u8 rec_data[6];
 
 /*************************************************
@@ -53,7 +53,7 @@ Selection:
 	29491200,32000000,
 	44236800,48000000
 *************************************************/
-#define MCU_SYSCLK		24000000
+#define MCU_SYSCLK		32000000
 
 /*************************************************/
 /*************************************************
@@ -85,6 +85,9 @@ set CpuClk (MAX.36MHz)
 #elif MCU_SYSCLK == 12000000
 #define RD_BAUND      S0BRG_BRGRL_9600_2X_12000000_1T       //9600
 #define RD_SPI_CLOCK  SPI_CLK_SYSCLK_16
+#elif MCU_SYSCLK == 32000000
+#define RD_BAUND      S0BRG_BRGRL_115200_2X_32000000_1T
+#define RD_SPI_CLOCK  SPI_CLK_SYSCLK_32
 #endif
 
 /***********************************************************************************
@@ -483,7 +486,7 @@ void read_all_flash(void){
 	{
 		data_flash[i] = read_data_flash(i);
 	}
-	Data_Read = (data_bl0942 *)(data_flash[0]);
+	Data_Read = (data_bl0942_t *)(&data_flash[0]);
 }
 
 /***********************************************************************************
@@ -681,6 +684,14 @@ void InitSystem(void)
 	WDT_Enable();  // enable WDT
 }
 
+void RD_init_uart(void){
+	Uart0RxIn = 0;
+	Uart0RxOut = 0;
+	Uart0TxIn = 0;
+	Uart0TxOut = 0;
+	bUart0TxFlag = 0;
+}
+
 /*
 int sprintf (char *__stream, const char *__format, ...)
 {
@@ -707,7 +718,6 @@ void rd_print(const char *__format, ...){
 		//SPI_nSS=1;
 //}
 
-
 void RD_Send_String_SPI(u8 *data_str){
 	u8 i = 0;
 	SPI_nSS=0;
@@ -722,18 +732,13 @@ void RD_Send_String_SPI(u8 *data_str){
 void main()
 {
     InitSystem();
-	/*====================UART========================*/
-	Uart0RxIn = 0;
-	Uart0RxOut = 0;
-	Uart0TxIn = 0;
-	Uart0TxOut = 0;
-	bUart0TxFlag = 0;
-	/*================================================*/
+	RD_init_uart();
+
 	DelayXms(1000);
 	rd_print("init done, size flash %u\n\n", (unsigned int)SIZE_DATA);
-	P60 = 1;
-	P61 = 0;
-	DelayXms(3000);
+	ON_LED(RD_LED_R);
+	OFF_LED(RD_LED_G);
+	DelayXms(5000);
 
 	
     while(1)
@@ -743,8 +748,8 @@ void main()
 		rd_loop();
 		
 		DelayXms(5000);
-		P60 =!P60;
-		P61 =!P61;
+		BLINK_LED(RD_LED_R);
+		BLINK_LED(RD_LED_G);
     }
 }
 
