@@ -30,21 +30,35 @@
 #define ON_LED(x)            (x = 0)
 #define OFF_LED(x)           (x = 1)
 #define BLINK_LED(x)         ((x)=!(x))
-#define RD_SIZE_FLASH        sizeof(data_bl0942_t)
+#define RD_SIZE_FLASH        sizeof(data_flash_t)
 #define SIZE_DATA            RD_SIZE_FLASH
+#define TIMEOUT_START_CHECK  1500   //ms
 
 typedef struct{
     u8 header;
+    //float Cos_Phi;
+    float P_old;
+    float I_old;
+    float P_stuck;
+    float I_stuck;
+    uint8_t check_stuck_fan;
+    uint8_t relay_stt;
+    u8 tail;
+}data_flash_t;
+ 
+typedef struct{
+//    u8 header;
     float U_hd;
     float I_hd;
     float P_hd;
     float Cos_Phi;
-    float P_old;
-    float I_old;
-    u8 tail;
+    // float P_old;
+    // float I_old;
+    // uint8_t check_stuck_fan;
+    // u8 tail;
 }data_bl0942_t;
 
-extern data_bl0942_t *Data_Read;
+extern data_flash_t *Read_Flash;
 
 extern void DelayXms(u16 xMs);
 extern void RD_Send_String_SPI(u8 *data_str);

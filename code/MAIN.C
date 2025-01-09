@@ -486,7 +486,7 @@ void read_all_flash(void){
 	{
 		data_flash[i] = read_data_flash(i);
 	}
-	Data_Read = (data_bl0942_t *)(&data_flash[0]);
+	Read_Flash = (data_flash_t *)(&data_flash[0]);
 }
 
 /***********************************************************************************
