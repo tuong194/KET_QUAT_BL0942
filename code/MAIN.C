@@ -53,7 +53,7 @@ Selection:
 	29491200,32000000,
 	44236800,48000000
 *************************************************/
-#define MCU_SYSCLK		32000000
+#define MCU_SYSCLK		24000000
 
 /*************************************************/
 /*************************************************
@@ -148,11 +148,11 @@ void INT_UART0(void) interrupt INT_VECTOR_UART0
 }
 
 
-u16 time_count = 0;
-u16 time_second = 0;
-u16 time_second_old = 0;
-u16 time_min = 0;
-u16 time_min_old = 0;
+// u16 time_count = 0;
+// u16 time_second = 0;
+// u16 time_second_old = 0;
+// u16 time_min = 0;
+// u16 time_min_old = 0;
 u16 time_system = 0;
 /***********************************************************************************
 Function:   	void INT_T0(void)
@@ -165,19 +165,19 @@ void INT_T0(void) interrupt INT_VECTOR_T0  // Timer 1ms
 	TH0 = TIMER_12T_1ms_TH;
 	TL0 = TIMER_12T_1ms_TL;
 	time_system++;
-	time_count++;
-	if (time_count >= 999)
-	{
-		time_count = 0;
-		time_second++;
-	}
-	if (time_second >= 59)
-	{
-		time_second = 0;
-		time_min++;
-		if (time_min >= 65534)
-			time_min = 0;
-	}
+	// time_count++;
+	// if (time_count >= 999)
+	// {
+	// 	time_count = 0;
+	// 	time_second++;
+	// }
+	// if (time_second >= 59)
+	// {
+	// 	time_second = 0;
+	// 	time_min++;
+	// 	if (time_min >= 65534)
+	// 		time_min = 0;
+	// }
 }
 
 /***********************************************************************************
@@ -736,20 +736,14 @@ void main()
 
 	DelayXms(1000);
 	rd_print("init done, size flash %u\n\n", (unsigned int)SIZE_DATA);
-	ON_LED(RD_LED_R);
-	OFF_LED(RD_LED_G);
-	DelayXms(5000);
-
+	rd_start_init();
 	
     while(1)
     {	
 		WDT_Clear();	
 		
 		rd_loop();
-		
-		DelayXms(5000);
-		BLINK_LED(RD_LED_R);
-		BLINK_LED(RD_LED_G);
+
     }
 }
 
