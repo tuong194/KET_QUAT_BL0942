@@ -162,7 +162,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>726</TopLine>
+      <TopLine>714</TopLine>
       <CurrentLine>738</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\MAIN.C</PathWithFileName>
@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>118</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>384</TopLine>
-      <CurrentLine>392</CurrentLine>
+      <TopLine>592</TopLine>
+      <CurrentLine>624</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\BL0942\BL0942.c</PathWithFileName>
       <FilenameWithoutPath>BL0942.c</FilenameWithoutPath>
@@ -186,8 +186,8 @@
 
   <AlienFiles>
     <PathWithFilename>E:\mgw\Code_Tuong\KETQUAT\CODE\BL0942\BL0942.H</PathWithFilename>
-    <TopLine>25</TopLine>
-    <CurrentLine>50</CurrentLine>
+    <TopLine>63</TopLine>
+    <CurrentLine>73</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1577,12 +1577,12 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>0</ActiveTab>
+      <ActiveTab>2</ActiveTab>
       <Documents>
         <Doc>
           <Name>..\code\MAIN.C</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>726</TopLine>
+          <TopLine>714</TopLine>
           <CurrentLine>738</CurrentLine>
         </Doc>
         <Doc>
@@ -1593,15 +1593,15 @@
         </Doc>
         <Doc>
           <Name>..\code\BL0942\BL0942.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>384</TopLine>
-          <CurrentLine>392</CurrentLine>
+          <ColumnNumber>118</ColumnNumber>
+          <TopLine>592</TopLine>
+          <CurrentLine>624</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\./BL0942/BL0942.H</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>25</TopLine>
-          <CurrentLine>50</CurrentLine>
+          <TopLine>63</TopLine>
+          <CurrentLine>73</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

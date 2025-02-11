@@ -734,7 +734,7 @@ void main()
     InitSystem();
 	RD_init_uart();
 
-	DelayXms(1000);
+	//DelayXms(1000);
 	rd_print("init done, size flash %u\n\n", (unsigned int)SIZE_DATA);
 	rd_start_init();
 	

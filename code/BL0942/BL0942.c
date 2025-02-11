@@ -28,65 +28,86 @@ xdata u8 flag_start_check_stuck = 0;
 xdata u16 rd_time_loop = 0;
 
 xdata data_bl0942_t data_bl0942 = {0};
-//data_bl0942_t *Data_Read =&data_bl0942;
-data_flash_t *Read_Flash; 
+// data_bl0942_t *Data_Read =&data_bl0942;
+data_flash_t *Read_Flash;
 
-void Blink_Led(u8 LED_PIN, u8 count_blink){
+void Blink_Led(u8 LED_PIN, u8 count_blink)
+{
     static u8 count = 0;
-    if(rd_exceed_ms(rd_time_tick, 200) && select_led_blink != RD_NONE){
-        if(LED_PIN == LED_G){
+    if (rd_exceed_ms(rd_time_tick, 200) && select_led_blink != RD_NONE)
+    {
+        if (LED_PIN == LED_G)
+        {
             BLINK_LED(RD_LED_G);
-        }else if(LED_PIN == LED_R){
+        }
+        else if (LED_PIN == LED_R)
+        {
             BLINK_LED(RD_LED_R);
-        }     
+        }
         count++;
         rd_time_tick = get_time_ms();
-        if(rd_time_tick >= 65534) rd_time_tick = 0;
-        if(count == count_blink*2){
+        if (rd_time_tick >= 65534)
+            rd_time_tick = 0;
+        if (count == count_blink * 2)
+        {
             select_led_blink = RD_NONE;
             count = 0;
         }
     }
 }
 
-void Blink_Led_Err(void){
+void Blink_Led_Err(void)
+{
     select_led_blink = LED_R;
     Blink_Led(LED_R, 3);
 }
 
-void Blink_Led_Config(void){
-    if(!Read_Flash->check_stuck_fan && select_led_blink == LED_G) 
+void Blink_Led_Config(void)
+{
+    if (!Read_Flash->check_stuck_fan && select_led_blink == LED_G)
         Blink_Led(LED_G, 3);
 }
 
-void Blink_Led_Start(void){
-    u8 i =0;
+void Blink_Led_Start(void)
+{
+    u8 i = 0;
     OFF_LED(RD_LED_R);
-    OFF_LED(RD_LED_G);
-    for(i = 0; i< 6; i++){
+    ON_LED(RD_LED_G);
+    for (i = 0; i < 6; i++)
+    {
         BLINK_LED(RD_LED_R);
         BLINK_LED(RD_LED_G);
-        DelayXms(500);
+        DelayXms(250);
     }
+    OFF_LED(RD_LED_R);
+    OFF_LED(RD_LED_G);
 }
 
-void RD_Init_flash(void){
+void RD_Init_flash(void)
+{
     read_all_flash();
-    rd_print("header: "); RD_PRINT_HEX(Read_Flash->header);
-    rd_print("tail: "); RD_PRINT_HEX(Read_Flash->tail);
+    rd_print("header: ");
+    RD_PRINT_HEX(Read_Flash->header);
+    rd_print("tail: ");
+    RD_PRINT_HEX(Read_Flash->tail);
     rd_print("\n");
-    if(Read_Flash->header != 0x55 && Read_Flash->tail != 0xaa){
+    if (Read_Flash->header != 0x55 && Read_Flash->tail != 0xaa)
+    {
         rd_print("init flash fail\n");
         Read_Flash->header = 0x55;
         Read_Flash->tail = 0xaa;
         Read_Flash->check_stuck_fan = 0;
-        Read_Flash->P_old = 0;//20;
+        Read_Flash->P_old = 0; // 20;
         Read_Flash->P_stuck = Read_Flash->P_old;
-        Read_Flash->I_old = 0;//0.0992;
+        Read_Flash->I_old = 0; // 0.0992;
         Read_Flash->I_stuck = Read_Flash->I_old;
         Read_Flash->U_old = 0; // 220;
         Read_Flash->relay_stt = 1;
-    }else{
+
+        //Read_Flash->Z_stuck = 0;
+    }
+    else
+    {
         rd_print("init flash OK\n");
     }
     write_data_fash();
@@ -117,7 +138,7 @@ void RD_Scan_Btn(void)
     WDT_Clear();
     time_scan_btn_new = temp_get_time;
     if (time_scan_btn_new < time_scan_btn_old)
-        time_scan_btn_old = time_scan_btn_new; // tran
+        time_scan_btn_old = time_scan_btn_new; // overflow
     if (time_scan_btn_new - time_scan_btn_old > 10)
     { // quet phim 10ms/1lan
         BTN_STT_NEW = get_btn();
@@ -184,9 +205,10 @@ void RD_Scan_Btn(void)
         }
         else if (check_press == 2)
         {
-            
-            config_P_I_Stuck();
-            select_led_blink = LED_G;   
+            if(!Read_Flash->check_stuck_fan){
+                config_P_I_Stuck();
+                select_led_blink = LED_G;
+            }
             count_btn = 0;
             check_hold_btn = 1;
             check_press = 0;
@@ -217,7 +239,7 @@ void RD_Scan_Btn(void)
             }
             else if (count_btn == 3)
             {
-                rd_print("reset chip ne\n");
+                rd_print("reset module\n");
                 select_led_blink = LED_R;
                 Read_Flash->check_stuck_fan = 0;
                 flag_start_check_stuck = 0;
@@ -307,8 +329,8 @@ int32_t RD_Read_Data_Signed_SPI(uint8_t reg_addr)
         {
             read_value |= 0xff000000; // mo rong bit dau
         }
-        //rd_print("value = %ld \n", read_value);
-        //rd_print("-----------------------------\n");
+        // rd_print("value = %ld \n", read_value);
+        // rd_print("-----------------------------\n");
         return read_value;
     }
     memset(rec_data, 0, 6);
@@ -350,12 +372,13 @@ u32 RD_Read_Data_SPI(uint8_t reg_addr)
 #endif
         return read_value;
     }
-    //rd_print("-----------------------------\n");
+    // rd_print("-----------------------------\n");
     memset(rec_data, 0, 6);
     return 0;
 }
 
-u8 rd_exceed_ms(u16 ref, u16 span_ms){
+u8 rd_exceed_ms(u16 ref, u16 span_ms)
+{
     return ((get_time_ms() - ref) >= span_ms);
 }
 
@@ -364,35 +387,39 @@ void RD_setup_BL0942(void)
     uint8_t Set_CF_ZX[3] = {0x00, 0x00, 0x23}; // 0010 0011: ZX 10, CF2 00, CF1 11
     uint8_t Set_Gain[3] = {0x00, 0x00, 0x03};
     uint8_t Set_Soft_Reset[3] = {0x5a, 0x5a, 0x5a};
-    RD_Send_Setup(GAIN_CR, Set_Gain);
-    RD_Send_Setup(SOFT_RESET, Set_Soft_Reset);
-    RD_Send_Setup(REG_OT_FUNX, Set_CF_ZX);
+    RD_Send_Setup(GAIN_CR, Set_Gain); // 0x1A
+    RD_Send_Setup(SOFT_RESET, Set_Soft_Reset);//0x1C
+    RD_Send_Setup(REG_OT_FUNX, Set_CF_ZX); //0x18
     rd_print("SET UP OK!\n\n\n");
 }
 
-void read_UIP(void){
+void read_UIP(void)
+{
     float temp_cal;
     U_in = RD_Read_Data_SPI(REG_VRMS);
-    temp_cal = 2375.72118f/(73989.0f * 510.0f); // temp_U //= (1.218*(390000*5 + 510)*0.001)
+    temp_cal = 2375.72118f / (73989.0f * 510.0f); // temp_U //= (1.218*(390000*5 + 510)*0.001)
     data_bl0942.U_hd = U_in * temp_cal;
     rd_print("U hd: %.2f V, \n", data_bl0942.U_hd);
-    //DelayXms(200);
+    // DelayXms(200);
 
     I_in = RD_Read_Data_SPI(REG_IRMS);
     temp_cal = 1.218 / 305978; // temp_I
     data_bl0942.I_hd = (I_in * temp_cal);
     rd_print("I hd: %.4f A, \n", data_bl0942.I_hd);
-    //DelayXms(200);
+    // DelayXms(200);
 
-/*  Test 
-    P_in = RD_Read_Data_Signed_SPI(REG_WATT);
-    temp_cal = 0.001604122; 
-    data_bl0942.P_hd = P_in * temp_cal;
-    rd_print("P hieu dung: %.3f W \n", data_bl0942.P_hd);
+    /* Test
+        P_in = RD_Read_Data_Signed_SPI(REG_WATT);
+        temp_cal = 0.001604122;
+        data_bl0942.P_hd = P_in * temp_cal;
+        rd_print("P hieu dung: %.3f W \n", data_bl0942.P_hd);
 
-    data_bl0942.Cos_Phi = (data_bl0942.P_hd) / ((data_bl0942.U_hd) * (data_bl0942.I_hd));
-    rd_print("Cos phi : %.3f \n\n", data_bl0942.Cos_Phi);
-*/
+        data_bl0942.Cos_Phi = (data_bl0942.P_hd) / ((data_bl0942.U_hd) * (data_bl0942.I_hd));
+        rd_print("Cos phi : %.3f \n\n", data_bl0942.Cos_Phi);
+    */
+    // data_bl0942.Z = data_bl0942.U_hd / data_bl0942.I_hd;
+    // rd_print("Tro khang Z: %.3f \n\n", data_bl0942.Z);
+
     if (data_bl0942.I_hd < 0.0001)
     {
         data_bl0942.P_hd = 0;
@@ -403,98 +430,134 @@ void read_UIP(void){
         P_in = RD_Read_Data_Signed_SPI(REG_WATT);
         temp_cal = 0.001604122; //=((1.218*1.218)*(390000*5 + 510))/(3537*0.001*510*1000*1000)  temp_P
         data_bl0942.P_hd = P_in * temp_cal;
-        if(data_bl0942.P_hd < 0 || data_bl0942.P_hd > 10000) data_bl0942.P_hd = 0;
-        rd_print("P hieu dung: %.3f W\n\n", data_bl0942.P_hd);
- 
+        if (data_bl0942.P_hd < 0 || data_bl0942.P_hd > 10000)
+            data_bl0942.P_hd = 0;
+        // rd_print("P hieu dung: %.3f W\n\n", data_bl0942.P_hd);
     }
 }
-void config_P_I_Stuck(void){
+void config_P_I_Stuck(void)
+{
     Read_Flash->P_old = data_bl0942.P_hd;
     Read_Flash->P_stuck = Read_Flash->P_old;
     Read_Flash->I_old = data_bl0942.I_hd;
     Read_Flash->I_stuck = Read_Flash->I_old;
     Read_Flash->U_old = data_bl0942.U_hd;
-    Read_Flash->Z = data_bl0942.U_hd / data_bl0942.I_hd;
+    //Read_Flash->Z_old = data_bl0942.U_hd / data_bl0942.I_hd;
+    //Read_Flash->Z_stuck = Read_Flash->Z_old;
     write_data_fash();
     rd_print("config P ket: %.3f W\n\n\n", Read_Flash->P_stuck);
+    //rd_print("config Z ket: %.3f Ohm\n\n\n", Read_Flash->Z_stuck);
 }
 
-void update_Pstuck_by_U(void){
+void update_Pstuck_by_U(void)
+{
     data_bl0942.Cos_Phi = data_bl0942.P_hd / (data_bl0942.U_hd * data_bl0942.I_hd);
-    if(CALC_EXCEED(data_bl0942.U_hd, Read_Flash->U_old) > 5){  // U tang 5%
-        Read_Flash->I_old = data_bl0942.I_hd;
+    if (CALC_EXCEED(data_bl0942.U_hd, Read_Flash->U_old) > 3)
+    { // U tang 5%
+        Read_Flash->I_old = (float)(0.001609*data_bl0942.U_hd*data_bl0942.U_hd - 0.2166*data_bl0942.U_hd + 69.3708)/1000;
         Read_Flash->I_stuck = Read_Flash->I_old;
-        Read_Flash->P_old = data_bl0942.P_hd;//(data_bl0942.U_hd * data_bl0942.U_hd * data_bl0942.Cos_Phi) / Read_Flash->Z;
+        Read_Flash->P_old = 0.0006853*data_bl0942.U_hd*data_bl0942.U_hd - 0.10797*data_bl0942.U_hd + 10.8147; 
         Read_Flash->P_stuck = Read_Flash->P_old;
         Read_Flash->U_old = data_bl0942.U_hd;
+        // Read_Flash->Z_old = data_bl0942.U_hd / data_bl0942.I_hd;
+        // Read_Flash->Z_stuck = Read_Flash->Z_old;
         write_data_fash();
+        rd_print("I ket up: %.3f A\n", Read_Flash->I_stuck);
         rd_print("P ket up: %.3f W\n\n", Read_Flash->P_stuck);
-    }else if(CALC_LESS(data_bl0942.U_hd, Read_Flash->U_old) > 5){ // U giam 5%
-        Read_Flash->I_old = data_bl0942.I_hd;
+    }
+    else if (CALC_LESS(data_bl0942.U_hd, Read_Flash->U_old) > 3)
+    { // U giam 5%
+        Read_Flash->I_old = (float)(0.001609*data_bl0942.U_hd*data_bl0942.U_hd - 0.2166*data_bl0942.U_hd + 69.3708)/1000;
         Read_Flash->I_stuck = Read_Flash->I_old;
-        Read_Flash->P_old = data_bl0942.P_hd;//(data_bl0942.U_hd * data_bl0942.U_hd * data_bl0942.Cos_Phi) / Read_Flash->Z;
+        Read_Flash->P_old = 0.0006853*data_bl0942.U_hd*data_bl0942.U_hd - 0.10797*data_bl0942.U_hd + 10.8147; 
         Read_Flash->P_stuck = Read_Flash->P_old;
         Read_Flash->U_old = data_bl0942.U_hd;
+        // Read_Flash->Z_old = data_bl0942.U_hd / data_bl0942.I_hd;
+        // Read_Flash->Z_stuck = Read_Flash->Z_old;
         write_data_fash();
+        rd_print("I ket down: %.3f A\n", Read_Flash->I_stuck);
         rd_print("P ket down: %.3f W\n\n", Read_Flash->P_stuck);
     }
-    else if((CALC_EXCEED(data_bl0942.U_hd, Read_Flash->U_old) < 1) || (CALC_LESS(data_bl0942.U_hd, Read_Flash->U_old) < 1)){
+    else if ((CALC_EXCEED(data_bl0942.U_hd, Read_Flash->U_old) < 1) || (CALC_LESS(data_bl0942.U_hd, Read_Flash->U_old) < 1))
+    {
         Read_Flash->U_old = data_bl0942.U_hd;
-        //Read_Flash->I_old = data_bl0942.I_hd;
+        // Read_Flash->I_old = data_bl0942.I_hd;
     }
 }
 
-void loop_check_stuck_fan(void){
-    if(data_bl0942.P_hd > 10 && Read_Flash->P_old > 0){
-        if(start_time_check_stuck >= 65530) start_time_check_stuck = 0 ;
-        if(Read_Flash->check_stuck_fan == 0 && Read_Flash->P_old > 0){
-            if(!flag_start_check_stuck){
-                if(rd_exceed_ms(start_time_check_stuck, TIMEOUT_START_CHECK)){
+void loop_check_stuck_fan(void)
+{
+    if (data_bl0942.P_hd > 5 && Read_Flash->P_old > 0)
+    {
+        if (start_time_check_stuck >= 65530)
+            start_time_check_stuck = 0;
+        if (Read_Flash->check_stuck_fan == 0 && Read_Flash->P_old > 0)
+        {
+            if (!flag_start_check_stuck)
+            {
+                if (rd_exceed_ms(start_time_check_stuck, TIMEOUT_START_CHECK))
+                {
                     start_time_check_stuck = temp_time_check_stuck;
                     flag_start_check_stuck = 1;
                     rd_print("start check stuck\n\n\n");
                 }
-            }else{
+            }
+            else
+            {
                 float temp_check_P = 0;
                 update_Pstuck_by_U();
-                if(data_bl0942.P_hd > Read_Flash->P_old){
-                    if(data_bl0942.I_hd > Read_Flash->I_old){
-                        if(((data_bl0942.I_hd - Read_Flash->I_old) / Read_Flash->I_stuck)*100 >= 1 ){  // I > 1%
-                            temp_check_P = ((data_bl0942.P_hd - Read_Flash->P_old) / Read_Flash->P_stuck)*100;
-                        }
+                if (data_bl0942.P_hd > Read_Flash->P_old)
+                {
+                    if (data_bl0942.I_hd > Read_Flash->I_old)
+                    {
+                        temp_check_P = ((data_bl0942.P_hd - Read_Flash->P_old) / Read_Flash->P_stuck) * 100;
+                        // if (((data_bl0942.I_hd - Read_Flash->I_old) / Read_Flash->I_stuck) * 1000 >= 5)
+                        // { // I > 0.5%
+                        //     temp_check_P = ((data_bl0942.P_hd - Read_Flash->P_old) / Read_Flash->P_stuck) * 100;
+                        // }
                     }
-                    if(data_bl0942.P_hd > Read_Flash->P_stuck && data_bl0942.I_hd > Read_Flash->I_stuck){
+                    if (data_bl0942.P_hd > Read_Flash->P_stuck && data_bl0942.I_hd > Read_Flash->I_stuck)
+                    {
                         Read_Flash->P_old = Read_Flash->P_stuck;
                         Read_Flash->I_old = Read_Flash->I_stuck;
                     }
-                }else{
+                }
+                else
+                {
                     // neu cong suat giam 2%
-                    if(((Read_Flash->P_old - data_bl0942.P_hd)/Read_Flash->P_old)*100 < 2){
+                    if (((Read_Flash->P_old - data_bl0942.P_hd) / Read_Flash->P_old) * 100 < 2)
+                    {
                         Read_Flash->P_old = data_bl0942.P_hd;
                         Read_Flash->I_old = data_bl0942.I_hd;
-                    } 
+                    }
                 }
-                 
-                if(temp_check_P >= 20){
+
+                if (temp_check_P >= P_THRESHOLD)
+                {
                     Read_Flash->check_stuck_fan = 1;
                     rd_print("delta P: %.2f \n", temp_check_P);
                     rd_print("VUOT MUC PICKLEBALL\n\n\n");
                     OFF_RELAY();
                 }
             }
-        }else{
+        }
+        else
+        {
             start_time_check_stuck = temp_time_check_stuck;
         }
-    }else{
+    }
+    else
+    {
         start_time_check_stuck = temp_time_check_stuck;
         flag_start_check_stuck = 0;
     }
 }
 
-void rd_start_init(void){
+void rd_start_init(void)
+{
     ON_RELAY();
     Blink_Led_Start();
-    DelayXms(3000);
+    DelayXms(1000);
 }
 
 void rd_loop(void)
@@ -506,17 +569,64 @@ void rd_loop(void)
         RD_setup_BL0942();
         rd_time_loop = get_time_ms();
         flag_start = 1;
-        rd_print("P ket init: %.3f W\n", Read_Flash->P_stuck);  
+        rd_print("P ket init: %.3f W\n", Read_Flash->P_stuck);
     }
     RD_Scan_Btn();
     Blink_Led_Config();
-    if(rd_exceed_ms(rd_time_loop, TIME_LOOP)){
+    if (rd_exceed_ms(rd_time_loop, TIME_LOOP))
+    {
         read_UIP();
         loop_check_stuck_fan();
         rd_time_loop = get_time_ms();
-        if(rd_time_loop >= 65530) rd_time_loop = 0;
+        if (rd_time_loop >= 65530)
+            rd_time_loop = 0;
     }
-    if(Read_Flash->check_stuck_fan == 1){
+    if (Read_Flash->check_stuck_fan == 1)
+    {
         Blink_Led_Err();
     }
 }
+
+/*
+void loop_check_stuck_fan_by_Z(void)
+{
+    if (data_bl0942.P_hd > 10 && Read_Flash->Z_stuck > 0)
+    {
+        if (start_time_check_stuck >= 65530)
+            start_time_check_stuck = 0;
+        if (Read_Flash->check_stuck_fan == 0)
+        {
+            if (!flag_start_check_stuck)
+            {
+                if (rd_exceed_ms(start_time_check_stuck, TIMEOUT_START_CHECK))
+                {
+                    start_time_check_stuck = temp_time_check_stuck;
+                    flag_start_check_stuck = 1;
+                    rd_print("start check stuck\n\n\n");
+                }
+            }
+            else
+            {
+                update_Pstuck_by_U();
+                if (CALC_LESS(data_bl0942.Z, Read_Flash->Z_stuck) >= 8)
+                {
+                    Read_Flash->check_stuck_fan = 1;
+                    rd_print("tro khang: %.3f \n", data_bl0942.Z);
+                    rd_print("VUOT MUC PICKLEBALL\n\n\n");
+                    OFF_RELAY();
+                }
+    
+            }
+        }
+        else
+        {
+            start_time_check_stuck = temp_time_check_stuck;
+        }
+    }
+    else
+    {
+        start_time_check_stuck = temp_time_check_stuck;
+        flag_start_check_stuck = 0;
+    }
+}
+*/

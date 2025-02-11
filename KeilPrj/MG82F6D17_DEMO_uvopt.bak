@@ -176,8 +176,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>377</TopLine>
-      <CurrentLine>392</CurrentLine>
+      <TopLine>23</TopLine>
+      <CurrentLine>50</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\BL0942\BL0942.c</PathWithFileName>
       <FilenameWithoutPath>BL0942.c</FilenameWithoutPath>
@@ -186,8 +186,8 @@
 
   <AlienFiles>
     <PathWithFilename>E:\mgw\Code_Tuong\KETQUAT\CODE\BL0942\BL0942.H</PathWithFilename>
-    <TopLine>25</TopLine>
-    <CurrentLine>50</CurrentLine>
+    <TopLine>63</TopLine>
+    <CurrentLine>73</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1594,14 +1594,14 @@
         <Doc>
           <Name>..\code\BL0942\BL0942.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>377</TopLine>
-          <CurrentLine>392</CurrentLine>
+          <TopLine>23</TopLine>
+          <CurrentLine>50</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\./BL0942/BL0942.H</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>25</TopLine>
-          <CurrentLine>50</CurrentLine>
+          <TopLine>63</TopLine>
+          <CurrentLine>73</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

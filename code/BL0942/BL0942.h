@@ -35,10 +35,12 @@
 #define ON_LED(x)            (x = 0)
 #define OFF_LED(x)           (x = 1)
 #define BLINK_LED(x)         ((x)=!(x))
+
 #define RD_SIZE_FLASH        sizeof(data_flash_t)
 #define SIZE_DATA            RD_SIZE_FLASH
 #define TIMEOUT_START_CHECK  1500   //ms
 #define TIME_LOOP            1000   //ms
+#define P_THRESHOLD          10     //%
 
 typedef struct{
     u8 header;
@@ -46,9 +48,10 @@ typedef struct{
     float U_old;
     float P_old;
     float I_old;
+    //float Z_old;
     float P_stuck;
     float I_stuck;
-    float Z;
+    //float Z_stuck;
     uint8_t check_stuck_fan;
     uint8_t relay_stt;
     u8 tail;
@@ -60,6 +63,7 @@ typedef struct{
     float I_hd;
     float P_hd;
     float Cos_Phi;
+    //float Z;
     // float P_old;
     // float I_old;
     // uint8_t check_stuck_fan;
@@ -90,6 +94,8 @@ void RD_Scan_Btn(void);
 void config_P_I_Stuck(void);
 void rd_start_init(void);
 void rd_loop(void);
+
+//void loop_check_stuck_fan_by_Z(void);
 
 
 #endif /* BL_0942_H_ */

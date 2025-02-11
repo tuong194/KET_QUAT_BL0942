@@ -7,3 +7,11 @@ E:\mgw\Code_Tuong\KETQUAT\KeilPrj\MG82F6D17_DEMO.uvproj
 Project File Date:  12/31/2024
 
 <h2>Output:</h2>
+Build target 'Target 1'
+compiling MAIN.C...
+compiling BL0942.c...
+..\CODE\BL0942\BL0942.C(107): error C204: 'Z_stuck': undefined member
+..\CODE\BL0942\BL0942.C(444): error C204: 'Z_old': undefined member
+..\CODE\BL0942\BL0942.C(445): error C204: 'Z_stuck': undefined member
+..\CODE\BL0942\BL0942.C(448): error C204: 'Z_stuck': undefined member
+Target not created
