@@ -50,6 +50,7 @@ void Blink_Led(u8 LED_PIN, u8 count_blink)
             rd_time_tick = 0;
         if (count == count_blink * 2)
         {
+            OFF_LED(RD_LED_G);
             select_led_blink = RD_NONE;
             count = 0;
         }
@@ -187,7 +188,7 @@ void RD_Scan_Btn(void)
             {
                 have_press = 1;
                 check_press = 2;
-                time_press_start = temp_get_time - 1000; // (3000 - 1000)ms scan 1 phat
+                time_press_start = temp_get_time - 500; // (3000 - 500)ms scan 1 phat
             }
         }
         BTN_STT_OLD = BTN_STT_NEW;
@@ -203,11 +204,12 @@ void RD_Scan_Btn(void)
             count_btn++;
             check_press = 0;
         }
-        else if (check_press == 2)
+        else if (check_press == 2) // nhan giu config
         {
-            if(!Read_Flash->check_stuck_fan){
+            if(!Read_Flash->check_stuck_fan && RD_RELAY == 1){
                 config_P_I_Stuck();
                 select_led_blink = LED_G;
+                rd_time_tick = get_time_ms();
             }
             count_btn = 0;
             check_hold_btn = 1;
@@ -231,7 +233,12 @@ void RD_Scan_Btn(void)
         {
             if (count_btn == 1)
             {
-                rd_print("1 phat\n");
+                rd_print("ON OFF\n");
+                BLINK_LED(RD_RELAY);
+                OFF_LED(RD_LED_R);
+                flag_start_check_stuck = 0;
+                Read_Flash->check_stuck_fan = 0;
+                start_time_check_stuck = temp_time_check_stuck;
             }
             else if (count_btn == 2)
             {
@@ -480,14 +487,14 @@ void update_Pstuck_by_U(void)
     }
     else if ((CALC_EXCEED(data_bl0942.U_hd, Read_Flash->U_old) < 1) || (CALC_LESS(data_bl0942.U_hd, Read_Flash->U_old) < 1))
     {
-        Read_Flash->U_old = data_bl0942.U_hd;
-        // Read_Flash->I_old = data_bl0942.I_hd;
+        //Read_Flash->U_old = data_bl0942.U_hd;
+     
     }
 }
 
 void loop_check_stuck_fan(void)
 {
-    if (data_bl0942.P_hd > 5 && Read_Flash->P_old > 0)
+    if (data_bl0942.U_hd > 100 && data_bl0942.P_hd > 5 && Read_Flash->P_old > 0)
     {
         if (start_time_check_stuck >= 65530)
             start_time_check_stuck = 0;
@@ -538,6 +545,7 @@ void loop_check_stuck_fan(void)
                     rd_print("delta P: %.2f \n", temp_check_P);
                     rd_print("VUOT MUC PICKLEBALL\n\n\n");
                     OFF_RELAY();
+                    
                 }
             }
         }
@@ -571,8 +579,7 @@ void rd_loop(void)
         flag_start = 1;
         rd_print("P ket init: %.3f W\n", Read_Flash->P_stuck);
     }
-    RD_Scan_Btn();
-    Blink_Led_Config();
+    RD_Scan_Btn();    
     if (rd_exceed_ms(rd_time_loop, TIME_LOOP))
     {
         read_UIP();
@@ -584,6 +591,8 @@ void rd_loop(void)
     if (Read_Flash->check_stuck_fan == 1)
     {
         Blink_Led_Err();
+    }else{
+        Blink_Led_Config();
     }
 }
 

@@ -160,10 +160,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>3</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>726</TopLine>
-      <CurrentLine>738</CurrentLine>
+      <TopLine>714</TopLine>
+      <CurrentLine>737</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\MAIN.C</PathWithFileName>
       <FilenameWithoutPath>MAIN.C</FilenameWithoutPath>
@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>136</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>23</TopLine>
-      <CurrentLine>50</CurrentLine>
+      <TopLine>228</TopLine>
+      <CurrentLine>249</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\BL0942\BL0942.c</PathWithFileName>
       <FilenameWithoutPath>BL0942.c</FilenameWithoutPath>
@@ -186,8 +186,8 @@
 
   <AlienFiles>
     <PathWithFilename>E:\mgw\Code_Tuong\KETQUAT\CODE\BL0942\BL0942.H</PathWithFilename>
-    <TopLine>63</TopLine>
-    <CurrentLine>73</CurrentLine>
+    <TopLine>23</TopLine>
+    <CurrentLine>23</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1581,9 +1581,9 @@
       <Documents>
         <Doc>
           <Name>..\code\MAIN.C</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>726</TopLine>
-          <CurrentLine>738</CurrentLine>
+          <ColumnNumber>3</ColumnNumber>
+          <TopLine>714</TopLine>
+          <CurrentLine>737</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\.\INCLUDE\API_MACRO_MG82F6D17.H</Name>
@@ -1593,15 +1593,15 @@
         </Doc>
         <Doc>
           <Name>..\code\BL0942\BL0942.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>23</TopLine>
-          <CurrentLine>50</CurrentLine>
+          <ColumnNumber>136</ColumnNumber>
+          <TopLine>228</TopLine>
+          <CurrentLine>249</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\./BL0942/BL0942.H</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>63</TopLine>
-          <CurrentLine>73</CurrentLine>
+          <TopLine>23</TopLine>
+          <CurrentLine>23</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

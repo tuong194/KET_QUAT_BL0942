@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 1   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
@@ -62,7 +62,7 @@ line level    source
   52                  22118400,24000000,
   53                  29491200,32000000,
   54                  44236800,48000000
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 2   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 2   
 
   55          *************************************************/
   56          #define MCU_SYSCLK              24000000
@@ -126,7 +126,7 @@ line level    source
  114          void INT_UART0(void) interrupt INT_VECTOR_UART0
  115          {
  116   1              _push_(SFRPI);
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 3   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 3   
 
  117   1      
  118   1              SFR_Page_(0);
@@ -190,7 +190,7 @@ line level    source
  176   1              //      time_second = 0;
  177   1              //      time_min++;
  178   1              //      if (time_min >= 65534)
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 4   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 4   
 
  179   1              //              time_min = 0;
  180   1              // }
@@ -254,7 +254,7 @@ line level    source
  238          Input:                  u8 Us -> *1us  (1~255)
  239          Output:     
  240          *************************************************/
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 5   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 5   
 
  241          void DelayXus(u8 xUs)
  242          {
@@ -318,7 +318,7 @@ line level    source
  300   2                      DelayXus(200);
  301   2                      DelayXus(200);
  302   2                      DelayXus(200);
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 6   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 6   
 
  303   2                      xMs--;
  304   2                      
@@ -382,7 +382,7 @@ line level    source
  362   1      }
  363          
  364          /***********************************************************************************
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 7   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 7   
 
  365          Function:       void InitTimer0()
  366          Description:    Initialize Timer0
@@ -446,7 +446,7 @@ line level    source
  424   1              IFMT = ISP_WRITE_P; // write P page sfr
  425   1              ISPCR = 0x80;           // Enable ISP/IAP
  426   1                                                      //      CheckTrapFlag();
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 8   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 8   
 
  427   1              SCMD = 0x46;
  428   1              //      CheckTrapFlag();
@@ -510,7 +510,7 @@ line level    source
  486   1              {
  487   2                      data_flash[i] = read_data_flash(i);
  488   2              }
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 9   
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 9   
 
  489   1              Read_Flash = (data_flash_t *)(&data_flash[0]);
  490   1      }
@@ -574,7 +574,7 @@ line level    source
                       
               #else
                       // SysClk=12MHz CpuClk=6MHz
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 10  
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 10  
 
                       CLK_SetCKCON0(IHRCO_12MHz|CPUCLK_SYSCLK_DIV_2|SYSCLK_MCKDO_DIV_1);
               #endif
@@ -638,7 +638,7 @@ line level    source
                       CLK_SetCKCON0(IHRCO_12MHz|CPUCLK_SYSCLK_DIV_1|SYSCLK_MCKDO_DIV_1|ENABLE_CKM|CKM_OSCIN_DIV_2);
                       DelayXus(100);
                       // IHRCO, MCK=CKMIx5.33, OSCin=IHRCO
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 11  
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 11  
 
                       CLK_SetCKCON2(ENABLE_IHRCO|MCK_CKMI_X533|OSCIn_IHRCO);
               #else
@@ -702,7 +702,7 @@ line level    source
  672          *************************************************************************************/
  673          void InitSystem(void)
  674          {
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 12  
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 12  
 
  675   1              InitPort();
  676   1              InitClock();
@@ -766,7 +766,7 @@ line level    source
  734   1          InitSystem();
  735   1              RD_init_uart();
  736   1      
-C51 COMPILER V9.01   MAIN                                                                  02/11/2025 10:28:08 PAGE 13  
+C51 COMPILER V9.01   MAIN                                                                  02/12/2025 15:59:38 PAGE 13  
 
  737   1              //DelayXms(1000);
  738   1              rd_print("init done, size flash %u\n\n", (unsigned int)SIZE_DATA);

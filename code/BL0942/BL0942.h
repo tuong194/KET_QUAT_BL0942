@@ -38,8 +38,8 @@
 
 #define RD_SIZE_FLASH        sizeof(data_flash_t)
 #define SIZE_DATA            RD_SIZE_FLASH
-#define TIMEOUT_START_CHECK  1500   //ms
-#define TIME_LOOP            1000   //ms
+#define TIMEOUT_START_CHECK  2500   //ms
+#define TIME_LOOP            500   //ms
 #define P_THRESHOLD          10     //%
 
 typedef struct{
