@@ -63,6 +63,7 @@ typedef struct{
     float I_hd;
     float P_hd;
     float Cos_Phi;
+    uint8_t flag_stuck;
     //float Z;
     // float P_old;
     // float I_old;
@@ -74,6 +75,12 @@ enum{
     RD_NONE = 0,
     LED_R   = 1,
     LED_G   = 2,
+    ALL_LED = 3,
+};
+
+enum{
+    RD_AUTO = 0,
+    RD_MANUAL = 1,
 };
 
 extern data_flash_t *Read_Flash;
