@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>76</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>439</TopLine>
-      <CurrentLine>452</CurrentLine>
+      <TopLine>605</TopLine>
+      <CurrentLine>637</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\code\BL0942\BL0942.c</PathWithFileName>
       <FilenameWithoutPath>BL0942.c</FilenameWithoutPath>
@@ -1593,9 +1593,9 @@
         </Doc>
         <Doc>
           <Name>..\code\BL0942\BL0942.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>439</TopLine>
-          <CurrentLine>452</CurrentLine>
+          <ColumnNumber>76</ColumnNumber>
+          <TopLine>605</TopLine>
+          <CurrentLine>637</CurrentLine>
         </Doc>
         <Doc>
           <Name>..\CODE\./BL0942/BL0942.H</Name>
