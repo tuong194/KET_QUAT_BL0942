@@ -87,12 +87,14 @@ void Blink_Led_Config(void)
     if (!(Read_Flash->fan_stuck[fan_id].check_stuck_fan))
     {
         ON_LED(RD_LED_G);
+        OFF_LED(RD_LED_R);
         for (i = 0; i < 6; i++)
         {
             BLINK_LED(RD_LED_G);
             DelayXms(150);
         }
         OFF_LED(RD_LED_G);
+        OFF_LED(RD_LED_R);
     }
 }
 
@@ -252,6 +254,9 @@ void RD_Scan_Btn(void)
         {
             if (!(Read_Flash->fan_stuck[fan_id].check_stuck_fan) && RD_RELAY == 1 )
             {
+                if(data_bl0942.flag_stuck == RD_MANUAL){
+                    read_UIP();
+                }
                 config_P_I_Stuck();
                 Blink_Led_Config();
             }

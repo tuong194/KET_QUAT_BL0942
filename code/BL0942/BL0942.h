@@ -95,6 +95,7 @@ extern void write_data_fash(void);
 
 //void RD_Init_flash(void);
 //void RD_Write_Data(uint8_t reg_addr, uint8_t *data_w);
+void read_UIP(void);
 u16 get_time_ms(void);
 u8 rd_exceed_ms(u16 ref, u16 span_ms);
 void RD_Send_Setup(uint8_t reg_addr, uint8_t *data_w);
